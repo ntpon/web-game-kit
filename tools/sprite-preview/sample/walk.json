@@ -1,0 +1,11 @@
+{
+  "source": "walk_keyed.png",
+  "frame_count": 4,
+  "cols": 4,
+  "rows": 1,
+  "cell": 256,
+  "scale": 0.43454,
+  "baseline_margin": 8,
+  "anchor": "feet",
+  "policy": "uniform_scale_bottom_center_anchor"
+}

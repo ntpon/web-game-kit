@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>particle-juice — feel-tuning demo</title>
+<style>
+  :root {
+    --bg: #14151a; --panel: #1d1f26; --panel2: #23262f; --line: #2e323d;
+    --ink: #e8eaf0; --dim: #8b90a0; --accent: #ffb648; --accent-ink: #1a1200;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f4f3ef; --panel: #fff; --panel2: #f0efe9; --line: #ddd9cf;
+            --ink: #23211c; --dim: #7b776b; --accent: #d97c00; --accent-ink: #fff; }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink);
+         font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+         min-height: 100vh; display: flex; flex-direction: column; }
+  header { padding: 12px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
+  header h1 { font-size: 15px; } header h1 b { color: var(--accent); }
+  header .hint { color: var(--dim); font-size: 12px; }
+  main { flex: 1; display: grid; grid-template-columns: 320px 1fr; min-height: 0; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  #panel { border-right: 1px solid var(--line); padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .group { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 11px; display: flex; flex-direction: column; gap: 7px; }
+  .group h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--dim); }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .row label { color: var(--dim); font-size: 12px; width: 88px; flex: none; }
+  .row output { width: 46px; text-align: right; font-size: 12px; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  button { background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
+           border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  button.toggled { outline: 2px solid var(--accent); }
+  .fire { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  #stagewrap { display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #game { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  footer { padding: 8px 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 11.5px; display: flex; gap: 16px; }
+  #toast { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+           background: var(--accent); color: var(--accent-ink); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1><b>particle-juice</b> · Phaser juice helpers, feel-tuning demo</h1>
+  <span class="hint">AI can set the numbers — only your hands can tell if they feel right</span>
+</header>
+<main>
+  <div id="panel">
+    <div class="group">
+      <h2>Fire an effect</h2>
+      <div class="fire">
+        <button data-fx="floatText">floatText</button>
+        <button data-fx="shake">shake</button>
+        <button data-fx="hitStop">hitStop + flash</button>
+        <button data-fx="squash">squash</button>
+        <button data-fx="pop">pop</button>
+        <button data-fx="dust">dust</button>
+        <button data-fx="poof">poof</button>
+        <button data-fx="spark">spark</button>
+        <button data-fx="trailToggle" id="btnTrail">trail (toggle)</button>
+        <button data-fx="combo" class="primary">HIT! (combo)</button>
+      </div>
+      <button id="btnSpam">spam mode (stress test)</button>
+    </div>
+    <div class="group">
+      <h2>Tune</h2>
+      <div class="row"><label>shake power</label><input type="range" id="shakeInt" min="1" max="50" value="10"><output>0.010</output></div>
+      <div class="row"><label>shake ms</label><input type="range" id="shakeDur" min="40" max="500" value="120"><output>120</output></div>
+      <div class="row"><label>hitStop ms</label><input type="range" id="hitMs" min="20" max="250" value="70"><output>70</output></div>
+      <div class="row"><label>squash amt</label><input type="range" id="sqAmt" min="5" max="50" value="25"><output>0.25</output></div>
+      <div class="row"><label>text rise</label><input type="range" id="ftRise" min="10" max="120" value="44"><output>44</output></div>
+      <div class="row"><label>particles ×</label><input type="range" id="pMul" min="1" max="40" value="10"><output>1.0</output></div>
+    </div>
+    <div class="group">
+      <h2>Export</h2>
+      <button id="btnCopy">Copy options JSON</button>
+      <span class="hint" style="font-size:11px;color:var(--dim)">tuned values, ready to paste into your game</span>
+    </div>
+  </div>
+  <div id="stagewrap"><div id="game"></div></div>
+</main>
+<footer>
+  <span>the sprite walks on its own — fire effects at it</span>
+  <span style="margin-left:auto">MIT · part of web-game-kit</span>
+</footer>
+<div id="toast">copied!</div>
+
+<script type="module">
+import * as J from './juice.js';
+
+const $ = id => document.getElementById(id);
+const W = 640, H = 400;
+let scene, hero, trailHandle = null, spam = null;
+
+// live-tuned options
+const T = {
+  shake: { intensity: 0.010, duration: 120 },
+  hitStop: { ms: 70 },
+  squash: { amount: 0.25 },
+  floatText: { rise: 44 },
+  particleMul: 1.0,
+};
+
+class Demo extends Phaser.Scene {
+  preload() {
+    // real AI-generated sample from the sibling tool; falls back to a plain box
+    this.load.spritesheet('hero', '../sprite-preview/sample/walk.png', { frameWidth: 256, frameHeight: 256 });
+  }
+  create() {
+    scene = this;
+    const ground = H - 90;
+    if (this.textures.exists('hero')) {
+      this.anims.create({ key: 'walk', frames: this.anims.generateFrameNumbers('hero', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+      hero = this.add.sprite(W / 2, ground, 'hero').setOrigin(0.5, 1).setScale(0.6);
+      hero.play('walk');
+    } else {
+      const g = this.make.graphics({}, false);
+      g.fillStyle(0x6fa8dc, 1); g.fillRoundedRect(0, 0, 60, 90, 8);
+      g.generateTexture('herobox', 60, 90); g.destroy();
+      hero = this.add.image(W / 2, ground, 'herobox').setOrigin(0.5, 1);
+    }
+    // pace back and forth so dust/trail make sense
+    this.tweens.add({ targets: hero, x: { from: W * 0.3, to: W * 0.7 },
+      duration: 2600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onYoyo: () => hero.setFlipX(true), onRepeat: () => hero.setFlipX(false) });
+    // footstep dust loop
+    this.time.addEvent({ delay: 320, loop: true, callback: () => {
+      if (!document.hidden) J.dust(this, hero.x, hero.y, { count: Math.round(3 * T.particleMul) });
+    }});
+    this.add.text(10, 8, 'particle-juice demo', { fontFamily: 'monospace', fontSize: '12px', color: '#888' });
+  }
+}
+
+new Phaser.Game({
+  type: Phaser.AUTO, parent: 'game', width: W, height: H,
+  backgroundColor: '#1a1c22', scene: Demo, pixelArt: true,
+});
+
+const FX = {
+  floatText: () => J.floatText(scene, hero.x, hero.y - hero.displayHeight, '+$' + (10 + Math.floor(Math.random() * 90)), { color: '#ffd75e', rise: T.floatText.rise }),
+  shake: () => J.shake(scene, T.shake),
+  hitStop: () => { J.hitStop(scene, T.hitStop.ms); J.flash(hero); J.shake(scene, { duration: 80, intensity: T.shake.intensity }); },
+  squash: () => J.squash(hero, T.squash),
+  pop: () => J.pop(hero),
+  dust: () => J.dust(scene, hero.x, hero.y, { count: Math.round(6 * T.particleMul) }),
+  poof: () => J.poof(scene, hero.x, hero.y - 40, { count: Math.round(12 * T.particleMul) }),
+  spark: () => J.spark(scene, hero.x, hero.y - hero.displayHeight * 0.6, { count: Math.round(14 * T.particleMul) }),
+  trailToggle: () => {
+    if (trailHandle) { trailHandle.stop(); trailHandle = null; $('btnTrail').classList.remove('toggled'); }
+    else { trailHandle = J.trail(scene, hero); $('btnTrail').classList.add('toggled'); }
+  },
+  combo: () => { FX.hitStop(); FX.spark(); FX.floatText(); FX.squash(); },
+};
+
+document.querySelectorAll('[data-fx]').forEach(b => b.onclick = () => FX[b.dataset.fx]());
+
+$('btnSpam').onclick = () => {
+  if (spam) { clearInterval(spam); spam = null; $('btnSpam').classList.remove('toggled'); return; }
+  $('btnSpam').classList.add('toggled');
+  const keys = ['floatText', 'squash', 'dust', 'poof', 'spark'];
+  spam = setInterval(() => FX[keys[Math.floor(Math.random() * keys.length)]](), 150);
+};
+
+// slider wiring
+const wire = (id, fn) => { const el = $(id); const out = el.parentElement.querySelector('output');
+  el.oninput = () => { out.textContent = fn(+el.value); }; };
+wire('shakeInt', v => (T.shake.intensity = v / 1000).toFixed(3));
+wire('shakeDur', v => T.shake.duration = v);
+wire('hitMs',    v => T.hitStop.ms = v);
+wire('sqAmt',    v => (T.squash.amount = v / 100).toFixed(2));
+wire('ftRise',   v => T.floatText.rise = v);
+wire('pMul',     v => (T.particleMul = v / 10).toFixed(1));
+
+$('btnCopy').onclick = () => {
+  const cfg = { shake: T.shake, hitStop: T.hitStop, squash: T.squash,
+                floatText: T.floatText, particleMultiplier: T.particleMul };
+  navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)).then(() => {
+    $('toast').style.display = 'block';
+    setTimeout(() => $('toast').style.display = 'none', 1200);
+  });
+};
+
+// test hook
+window.__pj = { fx: FX, tuned: T, juice: J, getScene: () => scene, getHero: () => hero };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/phaser@4/dist/phaser.min.js"></script>
+</body>
+</html>

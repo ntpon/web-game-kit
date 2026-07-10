@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprite Preview — check AI spritesheets before they hit your game</title>
+<style>
+  :root {
+    --bg: #14151a; --panel: #1d1f26; --panel2: #23262f; --line: #2e323d;
+    --ink: #e8eaf0; --dim: #8b90a0; --accent: #ffb648; --accent-ink: #1a1200;
+    --ok: #59c97b; --bad: #ff6b6b; --check1: #262933; --check2: #1b1d24;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f3ef; --panel: #ffffff; --panel2: #f0efe9; --line: #ddd9cf;
+      --ink: #23211c; --dim: #7b776b; --accent: #d97c00; --accent-ink: #fff;
+      --ok: #1f9d55; --bad: #d64545; --check1: #e9e7df; --check2: #f7f6f1;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  header { padding: 14px 20px; display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 15px; letter-spacing: .04em; }
+  header h1 b { color: var(--accent); }
+  header .hint { color: var(--dim); font-size: 12px; }
+  main { flex: 1; display: grid; grid-template-columns: 300px 1fr; gap: 0; min-height: 0; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+  /* ---- left panel ---- */
+  #panel { border-right: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .group { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .group h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--dim); }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  label { color: var(--dim); font-size: 12px; }
+  input[type=number] { width: 62px; background: var(--panel2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 4px 6px; font: inherit; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  button {
+    background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  button.toggled { outline: 2px solid var(--accent); }
+  .stat { font-size: 12px; color: var(--dim); }
+  .stat b { color: var(--ink); }
+
+  /* ---- stage ---- */
+  #stage { display: flex; flex-direction: column; min-width: 0; }
+  #dropzone {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; text-align: center; padding: 30px; cursor: pointer;
+  }
+  #dropzone .big { font-size: 18px; }
+  #dropzone .sub { color: var(--dim); font-size: 13px; max-width: 460px; }
+  #dropzone.over { outline: 3px dashed var(--accent); outline-offset: -14px; }
+  #viewwrap { flex: 1; display: none; align-items: center; justify-content: center; overflow: auto; padding: 16px; position: relative; }
+  canvas.checker { background: repeating-conic-gradient(var(--check1) 0% 25%, var(--check2) 0% 50%) 0 0 / 24px 24px; image-rendering: pixelated; border: 1px solid var(--line); }
+  #compare { display: none; gap: 18px; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+  .cmpbox { text-align: center; }
+  .cmpbox .tag { font-size: 11px; color: var(--dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .1em; }
+
+  /* ---- filmstrip ---- */
+  #strip { display: none; gap: 6px; padding: 10px 14px; overflow-x: auto; border-top: 1px solid var(--line); background: var(--panel); }
+  #strip canvas { background: repeating-conic-gradient(var(--check1) 0% 25%, var(--check2) 0% 50%) 0 0 / 12px 12px; image-rendering: pixelated; border: 2px solid var(--line); border-radius: 4px; cursor: pointer; flex: none; }
+  #strip canvas.cur { border-color: var(--accent); }
+  #strip canvas.inrange { border-bottom-color: var(--ok); }
+  footer { padding: 8px 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 11.5px; display: flex; gap: 16px; flex-wrap: wrap; }
+  kbd { background: var(--panel2); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+  #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1><b>sprite-preview</b> · check AI spritesheets before they hit your game</h1>
+  <span class="hint">everything runs locally — your images never leave this page</span>
+</header>
+
+<main>
+  <div id="panel">
+    <div class="group">
+      <h2>Sheet</h2>
+      <div class="stat" id="sheetinfo">no sheet loaded</div>
+      <div class="row">
+        <button id="btnOpen">Open PNG…</button>
+        <button id="btnOpenJson">Open JSON…</button>
+      </div>
+      <div class="stat">or drag &amp; drop files anywhere<br>(.png sheet + optional .json metadata)</div>
+    </div>
+
+    <div class="group" id="gridGroup" style="display:none">
+      <h2>Grid</h2>
+      <div class="row">
+        <label>cols</label><input type="number" id="cols" min="1" max="64" value="4">
+        <label>rows</label><input type="number" id="rows" min="1" max="64" value="4">
+      </div>
+      <div class="stat">frame: <b id="cellinfo">–</b></div>
+      <div class="row"><button id="btnGuess">Auto-guess grid</button></div>
+    </div>
+
+    <div class="group" id="playGroup" style="display:none">
+      <h2>Playback</h2>
+      <div class="row">
+        <button id="btnPlay" class="primary">Play</button>
+        <button id="btnPrev">◀ frame</button>
+        <button id="btnNext">frame ▶</button>
+      </div>
+      <div class="row">
+        <label>fps</label>
+        <input type="range" id="fps" min="1" max="60" value="10">
+        <span class="stat"><b id="fpsval">10</b></span>
+      </div>
+      <div class="row">
+        <label>range</label>
+        <input type="number" id="rangeStart" min="0" value="0">
+        <label>to</label>
+        <input type="number" id="rangeEnd" min="0" value="0">
+      </div>
+      <div class="stat">frame <b id="curinfo">0</b></div>
+    </div>
+
+    <div class="group" id="inspectGroup" style="display:none">
+      <h2>Inspect</h2>
+      <div class="row">
+        <button id="btnOnion">Onion skin</button>
+        <button id="btnBaseline">Baseline</button>
+      </div>
+      <div class="row" id="baselineRow" style="display:none">
+        <label>baseline offset (px from bottom)</label>
+        <input type="number" id="baselineOff" min="0" value="0">
+      </div>
+      <div class="row">
+        <button id="btnPin">Pin frame for compare</button>
+        <button id="btnCompare">Compare view</button>
+      </div>
+      <div class="row">
+        <label>zoom</label>
+        <button class="zoom" data-z="0">fit</button>
+        <button class="zoom" data-z="1">1×</button>
+        <button class="zoom" data-z="2">2×</button>
+        <button class="zoom" data-z="4">4×</button>
+        <button class="zoom" data-z="8">8×</button>
+      </div>
+    </div>
+
+    <div class="group" id="exportGroup" style="display:none">
+      <h2>Export</h2>
+      <div class="row"><button id="btnCopy">Copy config JSON</button></div>
+      <div class="stat">paste into your game / gameasset pipeline</div>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div id="dropzone">
+      <div class="big">Drop a spritesheet <b>.png</b> here</div>
+      <div class="sub">Optionally drop a <b>.json</b> next (gameasset <code>metadata.json</code>,
+        TexturePacker / Phaser atlas) to auto-configure the grid.
+        AI-generated walk cycles look fine frame-by-frame — the drift only shows when they move. This page shows the movement.</div>
+      <button class="primary">Choose files…</button>
+    </div>
+    <div id="viewwrap">
+      <canvas id="view" class="checker"></canvas>
+      <div id="compare">
+        <div class="cmpbox"><div class="tag">pinned <span id="pinIdx"></span></div><canvas id="cmpA" class="checker"></canvas></div>
+        <div class="cmpbox"><div class="tag">current <span id="curIdx"></span></div><canvas id="cmpB" class="checker"></canvas></div>
+      </div>
+    </div>
+    <div id="strip"></div>
+  </div>
+</main>
+
+<footer>
+  <span><kbd>space</kbd> play/pause</span>
+  <span><kbd>←</kbd><kbd>→</kbd> step frames</span>
+  <span><kbd>o</kbd> onion</span>
+  <span><kbd>b</kbd> baseline</span>
+  <span>what to look for: swapped legs · face changes · size wobble · floating feet</span>
+  <span style="margin-left:auto">MIT · part of web-game-kit</span>
+</footer>
+<div id="toast">copied!</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const S = {
+    img: null, cols: 4, rows: 4, frames: [], // frames: [{x,y,w,h}]
+    cur: 0, playing: false, fps: 10, rs: 0, re: 0,
+    onion: false, baseline: false, baseOff: 0, zoom: 0, // 0 = fit
+    pinned: 0, compare: false, lastTick: 0, acc: 0, jsonName: null,
+  };
+
+  /* ---------- file loading ---------- */
+  const readFile = f => new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    if (f.type === 'image/png' || /\.png$/i.test(f.name)) r.readAsDataURL(f);
+    else r.readAsText(f);
+  });
+
+  async function handleFiles(list) {
+    for (const f of list) {
+      if (/\.png$/i.test(f.name) || f.type === 'image/png') {
+        const url = await readFile(f);
+        await loadImage(url, f.name);
+      } else if (/\.json$/i.test(f.name)) {
+        try { applyJson(JSON.parse(await readFile(f)), f.name); }
+        catch (e) { alert('Could not parse JSON: ' + e.message); }
+      }
+    }
+  }
+
+  function loadImage(url, name) {
+    return new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        S.img = img; S.imgName = name;
+        if (!S.jsonName) { guessGrid(); rebuildGridFrames(); }
+        else rebuildGridFrames();
+        showUI(); resetRange(); drawAll(); res();
+      };
+      img.src = url;
+    });
+  }
+
+  /* ---------- json formats ---------- */
+  function applyJson(j, name) {
+    S.jsonName = name;
+    if (j.cols && j.rows && (j.cell || j.frame_count)) {
+      // gameasset metadata.json
+      S.cols = j.cols; S.rows = j.rows;
+      if (j.baseline_margin != null) { S.baseOff = j.baseline_margin; S.baseline = true; }
+      S.explicitFrames = null;
+      if (S.img) rebuildGridFrames();
+    } else if (j.frames && !Array.isArray(j.frames)) {
+      // TexturePacker / Phaser hash: { frames: { name: { frame:{x,y,w,h} } } }
+      S.explicitFrames = Object.values(j.frames).map(f => f.frame).map(f => ({ x: f.x, y: f.y, w: f.w, h: f.h }));
+    } else if (Array.isArray(j.frames)) {
+      // TexturePacker array: { frames: [ { frame:{x,y,w,h} } ] }
+      S.explicitFrames = j.frames.map(f => f.frame).map(f => ({ x: f.x, y: f.y, w: f.w, h: f.h }));
+    } else {
+      alert('Unrecognized JSON format (expected gameasset metadata or TexturePacker/Phaser atlas).');
+      S.jsonName = null; return;
+    }
+    if (S.explicitFrames) S.frames = S.explicitFrames;
+    if (S.img) { showUI(); resetRange(); drawAll(); }
+  }
+
+  /* ---------- grid ---------- */
+  function rebuildGridFrames() {
+    if (S.explicitFrames) { S.frames = S.explicitFrames; return; }
+    const w = Math.floor(S.img.width / S.cols), h = Math.floor(S.img.height / S.rows);
+    S.frames = [];
+    for (let r = 0; r < S.rows; r++) for (let c = 0; c < S.cols; c++)
+      S.frames.push({ x: c * w, y: r * h, w, h });
+  }
+
+  function guessGrid() {
+    // score divisor pairs by cell squareness and sensible frame counts
+    const W = S.img.width, H = S.img.height;
+    let best = { cols: 1, rows: 1, score: -1e9 };
+    for (let c = 1; c <= 32; c++) {
+      if (W % c) continue;
+      for (let r = 1; r <= 16; r++) {
+        if (H % r) continue;
+        const cw = W / c, ch = H / r, n = c * r;
+        if (cw < 8 || ch < 8 || n > 128) continue;
+        const sq = -Math.abs(Math.log(cw / ch));            // prefer square cells
+        const nice = [4, 6, 8, 12, 16, 24, 32].includes(n) ? 1.2 : 0;
+        const multi = n > 1 ? 1 : -2;                        // a sheet usually has >1 frame
+        const score = sq * 2 + nice + multi + Math.min(n, 16) * 0.05;
+        if (score > best.score) best = { cols: c, rows: r, score };
+      }
+    }
+    S.cols = best.cols; S.rows = best.rows;
+    S.explicitFrames = null;
+  }
+
+  function resetRange() {
+    S.rs = 0; S.re = S.frames.length - 1; S.cur = 0;
+    $('rangeStart').value = 0; $('rangeEnd').value = S.re;
+    $('rangeStart').max = $('rangeEnd').max = S.re;
+  }
+
+  /* ---------- ui sync ---------- */
+  function showUI() {
+    $('dropzone').style.display = 'none';
+    $('viewwrap').style.display = 'flex';
+    $('strip').style.display = 'flex';
+    for (const id of ['gridGroup', 'playGroup', 'inspectGroup', 'exportGroup']) $(id).style.display = 'flex';
+    $('gridGroup').style.opacity = S.explicitFrames ? .45 : 1;
+    $('cols').value = S.cols; $('rows').value = S.rows;
+    const f = S.frames[0];
+    $('cellinfo').textContent = f ? `${f.w}×${f.h}px × ${S.frames.length} frames` : '–';
+    $('sheetinfo').innerHTML = `<b>${S.imgName || 'sheet'}</b> ${S.img.width}×${S.img.height}px` +
+      (S.jsonName ? `<br>json: <b>${S.jsonName}</b>` : '');
+    $('baselineOff').value = S.baseOff;
+    $('baselineRow').style.display = S.baseline ? 'flex' : 'none';
+    $('btnOnion').classList.toggle('toggled', S.onion);
+    $('btnBaseline').classList.toggle('toggled', S.baseline);
+    buildStrip();
+  }
+
+  /* ---------- drawing ---------- */
+  function frameScale(f) {
+    if (S.zoom > 0) return S.zoom;
+    const wrap = $('viewwrap');
+    const availW = wrap.clientWidth - 60, availH = wrap.clientHeight - 60;
+    const s = Math.max(1, Math.floor(Math.min(availW / f.w, availH / f.h)));
+    return Math.min(s, 12);
+  }
+
+  function drawFrameTo(canvas, idx, opts = {}) {
+    const f = S.frames[idx]; if (!f) return;
+    const s = opts.scale || frameScale(f);
+    canvas.width = f.w * s; canvas.height = f.h * s;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (opts.onionIdx != null && S.frames[opts.onionIdx]) {
+      const o = S.frames[opts.onionIdx];
+      ctx.globalAlpha = .32;
+      ctx.drawImage(S.img, o.x, o.y, o.w, o.h, 0, 0, o.w * s, o.h * s);
+      ctx.globalAlpha = 1;
+    }
+    ctx.drawImage(S.img, f.x, f.y, f.w, f.h, 0, 0, f.w * s, f.h * s);
+    if (opts.baseline) {
+      const y = canvas.height - S.baseOff * s;
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--bad');
+      ctx.lineWidth = Math.max(1, s / 2);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+  }
+
+  function drawAll() {
+    if (!S.img || !S.frames.length) return;
+    if (S.compare) {
+      $('view').style.display = 'none'; $('compare').style.display = 'flex';
+      drawFrameTo($('cmpA'), S.pinned, { baseline: S.baseline });
+      drawFrameTo($('cmpB'), S.cur, { baseline: S.baseline });
+      $('pinIdx').textContent = '#' + S.pinned; $('curIdx').textContent = '#' + S.cur;
+    } else {
+      $('view').style.display = 'block'; $('compare').style.display = 'none';
+      const prev = S.cur > S.rs ? S.cur - 1 : S.re;
+      drawFrameTo($('view'), S.cur, { onionIdx: S.onion ? prev : null, baseline: S.baseline });
+    }
+    $('curinfo').textContent = `${S.cur} / ${S.frames.length - 1}`;
+    [...$('strip').children].forEach((c, i) => {
+      c.classList.toggle('cur', i === S.cur);
+      c.classList.toggle('inrange', i >= S.rs && i <= S.re);
+    });
+  }
+
+  function buildStrip() {
+    const strip = $('strip'); strip.innerHTML = '';
+    S.frames.forEach((f, i) => {
+      const c = document.createElement('canvas');
+      const s = Math.max(1, Math.floor(56 / Math.max(f.w, f.h))) || 1;
+      const sc = 56 / Math.max(f.w, f.h);
+      c.width = Math.round(f.w * sc); c.height = Math.round(f.h * sc);
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(S.img, f.x, f.y, f.w, f.h, 0, 0, c.width, c.height);
+      c.title = 'frame ' + i;
+      c.onclick = () => { S.cur = i; S.playing = false; syncPlayBtn(); drawAll(); };
+      strip.appendChild(c);
+    });
+  }
+
+  /* ---------- playback ---------- */
+  function tick(t) {
+    requestAnimationFrame(tick);
+    if (!S.playing || !S.frames.length) { S.lastTick = t; return; }
+    const dt = (t - S.lastTick) / 1000; S.lastTick = t;
+    S.acc += dt;
+    const step = 1 / S.fps;
+    while (S.acc >= step) {
+      S.acc -= step;
+      S.cur = S.cur >= S.re ? S.rs : S.cur + 1;
+    }
+    drawAll();
+  }
+  requestAnimationFrame(tick);
+
+  function syncPlayBtn() { $('btnPlay').textContent = S.playing ? 'Pause' : 'Play'; }
+
+  /* ---------- events ---------- */
+  const dz = document.body;
+  dz.addEventListener('dragover', e => { e.preventDefault(); $('dropzone').classList.add('over'); });
+  dz.addEventListener('dragleave', () => $('dropzone').classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); $('dropzone').classList.remove('over');
+    handleFiles([...e.dataTransfer.files]);
+  });
+
+  const filePick = accept => new Promise(res => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = accept; inp.multiple = true;
+    inp.onchange = () => res([...inp.files]);
+    inp.click();
+  });
+  $('dropzone').onclick = async () => handleFiles(await filePick('.png,.json'));
+  $('btnOpen').onclick = async () => handleFiles(await filePick('.png'));
+  $('btnOpenJson').onclick = async () => handleFiles(await filePick('.json'));
+
+  $('cols').onchange = $('rows').onchange = () => {
+    S.cols = +$('cols').value || 1; S.rows = +$('rows').value || 1;
+    S.explicitFrames = null; S.jsonName = null;
+    rebuildGridFrames(); resetRange(); showUI(); drawAll();
+  };
+  $('btnGuess').onclick = () => { guessGrid(); rebuildGridFrames(); resetRange(); showUI(); drawAll(); };
+
+  $('btnPlay').onclick = () => { S.playing = !S.playing; S.acc = 0; syncPlayBtn(); };
+  $('btnPrev').onclick = () => { S.playing = false; syncPlayBtn(); S.cur = S.cur <= S.rs ? S.re : S.cur - 1; drawAll(); };
+  $('btnNext').onclick = () => { S.playing = false; syncPlayBtn(); S.cur = S.cur >= S.re ? S.rs : S.cur + 1; drawAll(); };
+  $('fps').oninput = () => { S.fps = +$('fps').value; $('fpsval').textContent = S.fps; };
+  $('rangeStart').onchange = () => { S.rs = Math.max(0, Math.min(+$('rangeStart').value, S.frames.length - 1)); if (S.cur < S.rs) S.cur = S.rs; drawAll(); };
+  $('rangeEnd').onchange = () => { S.re = Math.max(S.rs, Math.min(+$('rangeEnd').value, S.frames.length - 1)); if (S.cur > S.re) S.cur = S.re; drawAll(); };
+
+  $('btnOnion').onclick = () => { S.onion = !S.onion; showUI(); drawAll(); };
+  $('btnBaseline').onclick = () => { S.baseline = !S.baseline; showUI(); drawAll(); };
+  $('baselineOff').onchange = () => { S.baseOff = +$('baselineOff').value || 0; drawAll(); };
+  $('btnPin').onclick = () => { S.pinned = S.cur; if (S.compare) drawAll(); };
+  $('btnCompare').onclick = () => { S.compare = !S.compare; $('btnCompare').classList.toggle('toggled', S.compare); drawAll(); };
+  document.querySelectorAll('.zoom').forEach(b => b.onclick = () => { S.zoom = +b.dataset.z; drawAll(); });
+
+  $('btnCopy').onclick = () => {
+    const f = S.frames[0] || {};
+    const cfg = { cols: S.cols, rows: S.rows, frameWidth: f.w, frameHeight: f.h,
+                  frameCount: S.frames.length, fps: S.fps, range: [S.rs, S.re],
+                  baselineOffset: S.baseOff };
+    navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)).then(() => {
+      const t = $('toast'); t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 1200);
+    });
+  };
+
+  document.addEventListener('keydown', e => {
+    if (!S.img || e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); $('btnPlay').click(); }
+    else if (e.key === 'ArrowLeft') $('btnPrev').click();
+    else if (e.key === 'ArrowRight') $('btnNext').click();
+    else if (e.key === 'o') $('btnOnion').click();
+    else if (e.key === 'b') $('btnBaseline').click();
+  });
+
+  window.addEventListener('resize', drawAll);
+  // test hook (used by automated checks; harmless for humans)
+  window.__sp = { state: S, handleFiles, applyJson, loadImage, drawAll };
+})();
+</script>
+</body>
+</html>
