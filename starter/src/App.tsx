@@ -32,7 +32,11 @@ export default function App() {
       <div ref={mountRef} style={{ marginTop: 10 }} />
       <p style={{ color: '#9aa0a8' }}>
         Every number lives in <code>src/config/*.json</code> — edit while <code>pnpm dev</code> runs
-        and the page reloads on your change. Part of web-game-kit.
+        and the page reloads on your change. Part of web-game-kit · by{' '}
+        <a href="https://ntpon.com" style={{ color: '#9aa0a8' }}>
+          Nattapon Suetrong
+        </a>
+        .
       </p>
     </div>
   );

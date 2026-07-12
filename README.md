@@ -26,3 +26,4 @@ cd web-game-kit/starter && pnpm install && pnpm dev   # walkable demo → http:/
 No-install option: open `tools/sprite-preview/index.html` and drag in `sample/walk.png`.
 
 MIT — use anything here in your own games, commercial or not.
+Made by [Nattapon Suetrong](https://ntpon.com).
