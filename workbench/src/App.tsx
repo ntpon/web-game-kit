@@ -24,7 +24,8 @@ const ROUTES: Route[] = [
     render: () => (
       <ToolFramePage
         title="Sprite preview"
-        lede="Drop in an AI-generated spritesheet and catch drift (swapped legs, size wobble, floating feet) before it hits your game. Try the bundled sample: tools/sprite-preview/sample/walk.png."
+        lede="The bundled 4-frame walk starts playing on open. Drop in your own AI-generated sheet and catch drift — swapped legs, size wobble, floating feet — the moment it moves."
+        artifact="config JSON + a verified sheet"
         src="tools/sprite-preview/index.html"
       />
     ),
@@ -36,7 +37,8 @@ const ROUTES: Route[] = [
     render: () => (
       <ToolFramePage
         title="Particle juice"
-        lede="Fire each effect, drag the sliders until it feels right, then Copy options JSON into your game. The helpers are copy-paste files for Phaser: tools/particle-juice/juice.ts."
+        lede="Fire each effect at the walking sprite and drag the sliders until your hands say it feels right. The helpers are copy-paste Phaser files: tools/particle-juice/juice.ts."
+        artifact="juice options JSON"
         src="tools/particle-juice/demo.html"
       />
     ),
@@ -70,8 +72,11 @@ export default function App() {
     <div className="shell">
       <nav className="sidebar">
         <div className="brand">
-          web-game-kit
-          <small>workbench</small>
+          <div className="brandmark" />
+          <div>
+            <b>web-game-kit</b>
+            <small>workbench</small>
+          </div>
         </div>
         <div className="section">Learn</div>
         {nav('learn')}

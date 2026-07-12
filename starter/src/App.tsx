@@ -19,21 +19,21 @@ export default function App() {
         <span>
           arrows / WASD to move · Shift to sprint ·{' '}
           {editing ? (
-            <a href="./" style={{ color: '#7ab8ff' }}>
+            <a href="./" style={{ color: '#ffb648' }}>
               exit edit mode
             </a>
           ) : (
-            <a href="?edit=1" style={{ color: '#7ab8ff' }}>
+            <a href="?edit=1" style={{ color: '#ffb648' }}>
               edit the map
             </a>
           )}
         </span>
       </header>
       <div ref={mountRef} style={{ marginTop: 10 }} />
-      <p style={{ color: '#9aa0a8' }}>
+      <p style={{ color: '#8b90a0' }}>
         Every number lives in <code>src/config/*.json</code> — edit while <code>pnpm dev</code> runs
         and the page reloads on your change. Part of web-game-kit · by{' '}
-        <a href="https://ntpon.com" style={{ color: '#9aa0a8' }}>
+        <a href="https://ntpon.com" style={{ color: '#8b90a0' }}>
           Nattapon Suetrong
         </a>
         .

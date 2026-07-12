@@ -15,9 +15,7 @@ const TEXTURE_SRC: Record<string, string> = {
 
 const TERRAIN_DISPLAY = 154; // same overlap trick as the starter
 const LIFT = 200; // world px above y=0 kept visible for tall props
-const W = 640;
-const H = 440;
-const PAD = 10;
+const PAD = 12;
 
 export type EditorMode = 'place' | 'collision';
 
@@ -29,11 +27,29 @@ export default function MapCanvas(props: {
   onTileClick: (tile: { x: number; y: number }) => void;
 }) {
   const { map, version, mode, selectedType, onTileClick } = props;
+  const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef(new Map<string, HTMLImageElement>());
   const [loadTick, setLoadTick] = useState(0);
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
+  const [size, setSize] = useState({ w: 760, h: 470 });
 
+  // fill the space next to the panel — the map is the workspace, not a thumbnail
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = Math.max(560, Math.min(1400, el.clientWidth));
+      setSize({ w, h: Math.round(w * 0.62) });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const W = size.w;
+  const H = size.h;
   const worldW = (map.grid.width + map.grid.height) * HALF_TILE_W;
   const worldH = (map.grid.width + map.grid.height) * HALF_TILE_H;
   const scale = Math.min((W - PAD * 2) / worldW, (H - PAD * 2) / (worldH + LIFT));
@@ -75,9 +91,9 @@ export default function MapCanvas(props: {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dpr = window.devicePixelRatio || 1;
-    if (canvas.width !== W * dpr) {
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
     }
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -93,8 +109,8 @@ export default function MapCanvas(props: {
         if (!img.complete || img.naturalWidth === 0) return;
         const p = tileToScreen(x + 0.5, y + 0.5, 0, 0);
         const c = toCanvas(p.x, p.y);
-        const size = TERRAIN_DISPLAY * scale;
-        ctx.drawImage(img, c.x - size / 2, c.y - size / 2, size, size);
+        const cell = TERRAIN_DISPLAY * scale;
+        ctx.drawImage(img, c.x - cell / 2, c.y - cell / 2, cell, cell);
       });
     });
 
@@ -159,10 +175,10 @@ export default function MapCanvas(props: {
         ctx.globalAlpha = 1;
       } else {
         tilePath(ctx, Math.floor(item.x), Math.floor(item.y));
-        ctx.fillStyle = 'rgba(122, 184, 255, 0.5)';
+        ctx.fillStyle = 'rgba(255, 182, 72, 0.5)';
         ctx.fill();
-        ctx.fillStyle = '#e8e8e8';
-        ctx.font = '10px system-ui';
+        ctx.fillStyle = '#e8eaf0';
+        ctx.font = '10px ui-monospace, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(item.type, c.x, c.y);
       }
@@ -174,7 +190,7 @@ export default function MapCanvas(props: {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
       ctx.fill();
     }
-  }, [map, version, hover, loadTick, scale, mode, selectedType]);
+  }, [map, version, hover, loadTick, scale, mode, selectedType, W, H]);
 
   const pointerTile = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -189,19 +205,21 @@ export default function MapCanvas(props: {
     t.x >= 0 && t.x < map.grid.width && t.y >= 0 && t.y < map.grid.height;
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="editor-canvas"
-      style={{ width: W, height: H }}
-      onMouseMove={(e) => {
-        const t = pointerTile(e);
-        setHover(inBounds(t) ? t : null);
-      }}
-      onMouseLeave={() => setHover(null)}
-      onClick={(e) => {
-        const t = pointerTile(e);
-        if (inBounds(t)) onTileClick(t);
-      }}
-    />
+    <div ref={wrapRef} className="editor-canvas-wrap">
+      <canvas
+        ref={canvasRef}
+        className="editor-canvas"
+        style={{ aspectRatio: `${W} / ${H}` }}
+        onMouseMove={(e) => {
+          const t = pointerTile(e);
+          setHover(inBounds(t) ? t : null);
+        }}
+        onMouseLeave={() => setHover(null)}
+        onClick={(e) => {
+          const t = pointerTile(e);
+          if (inBounds(t)) onTileClick(t);
+        }}
+      />
+    </div>
   );
 }

@@ -10,14 +10,10 @@
     --ink: #e8eaf0; --dim: #8b90a0; --accent: #ffb648; --accent-ink: #1a1200;
     --ok: #59c97b; --bad: #ff6b6b; --check1: #262933; --check2: #1b1d24;
   }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #f4f3ef; --panel: #ffffff; --panel2: #f0efe9; --line: #ddd9cf;
-      --ink: #23211c; --dim: #7b776b; --accent: #d97c00; --accent-ink: #fff;
-      --ok: #1f9d55; --bad: #d64545; --check1: #e9e7df; --check2: #f7f6f1;
-    }
-  }
+  /* dark-only on purpose: checkerboards and pixel art read best on dark,
+     and the tool always matches the workbench shell */
   * { box-sizing: border-box; margin: 0; }
+  body.embed header, body.embed footer { display: none; }
   body {
     background: var(--bg); color: var(--ink);
     font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -186,6 +182,8 @@
 <script>
 (() => {
   const $ = id => document.getElementById(id);
+  // inside the workbench the shell owns the header/footer
+  if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
   const S = {
     img: null, cols: 4, rows: 4, frames: [], // frames: [{x,y,w,h}]
     cur: 0, playing: false, fps: 10, rs: 0, re: 0,

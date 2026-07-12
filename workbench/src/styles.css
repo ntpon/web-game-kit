@@ -1,3 +1,20 @@
+/* One token set for the whole kit — identical to tools/sprite-preview and
+   tools/particle-juice, so the shell and every embedded tool read as one
+   instrument panel. Dark-only on purpose: pixel art and checkerboards live
+   here, and game editors are dark. */
+:root {
+  --bg: #14151a;
+  --panel: #1d1f26;
+  --panel2: #23262f;
+  --line: #2e323d;
+  --ink: #e8eaf0;
+  --dim: #8b90a0;
+  --accent: #ffb648;
+  --accent-ink: #1a1200;
+  --ok: #59c97b;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,13 +24,13 @@ body,
 #root {
   margin: 0;
   height: 100%;
-  background: #14161a;
-  color: #e8e8e8;
-  font: 14px/1.55 system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13.5px/1.6 var(--mono);
 }
 
 a {
-  color: #7ab8ff;
+  color: var(--accent);
 }
 
 .shell {
@@ -21,106 +38,202 @@ a {
   height: 100%;
 }
 
+/* ---- sidebar ---- */
 .sidebar {
-  width: 224px;
+  width: 232px;
   flex-shrink: 0;
-  background: #101216;
-  border-right: 1px solid #23262d;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  padding: 14px 10px;
+  padding: 16px 12px;
   gap: 2px;
 }
 
-.sidebar .brand {
-  font-weight: 700;
-  padding: 4px 10px 12px;
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 2px 8px 14px;
 }
 
-.sidebar .brand small {
+.brandmark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: repeating-conic-gradient(var(--accent) 0% 25%, var(--panel2) 0% 50%) 0 0 / 11px 11px;
+}
+
+.brand b {
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.brand small {
   display: block;
-  color: #9aa0a8;
+  color: var(--dim);
+  font-size: 11px;
   font-weight: 400;
 }
 
-.sidebar .section {
-  color: #9aa0a8;
+.section {
+  color: var(--dim);
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 12px 10px 4px;
+  letter-spacing: 0.12em;
+  padding: 14px 8px 5px;
 }
 
-.sidebar a.nav {
+a.nav {
   display: block;
-  padding: 7px 10px;
-  border-radius: 6px;
-  color: #cfd3da;
+  padding: 7px 8px 7px 10px;
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  color: var(--ink);
   text-decoration: none;
+  font-size: 13px;
 }
 
-.sidebar a.nav:hover {
-  background: #191c22;
+a.nav:hover {
+  background: var(--panel2);
 }
 
-.sidebar a.nav.active {
-  background: #1d2129;
-  color: #fff;
+a.nav.active {
+  background: var(--panel2);
+  border-left-color: var(--accent);
 }
 
-.sidebar .foot {
+.foot {
   margin-top: auto;
-  padding: 10px;
-  color: #9aa0a8;
-  font-size: 12px;
+  padding: 10px 8px 2px;
+  color: var(--dim);
+  font-size: 11.5px;
+  line-height: 1.8;
 }
 
+.foot a {
+  color: var(--dim);
+}
+
+/* ---- content + shared page head ---- */
 .content {
   flex: 1;
+  min-width: 0;
   overflow: auto;
   display: flex;
   flex-direction: column;
 }
 
-.page {
-  padding: 22px 26px 40px;
-  max-width: 880px;
+.page-head {
+  flex: none;
+  padding: 16px 28px 13px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
 }
 
-.page h1 {
-  margin: 0 0 4px;
-  font-size: 20px;
+.page-head h1 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-head .lede {
+  margin: 3px 0 0;
+  color: var(--dim);
+  font-size: 12.5px;
+  max-width: 780px;
+}
+
+/* the hand-off chip: what this page produces for your AI agent */
+.chip {
+  margin-left: auto;
+  flex: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 11px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.chip .lbl {
+  color: var(--dim);
+}
+
+.chip .art {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ---- docs pages ---- */
+.page {
+  padding: 22px 28px 48px;
+  max-width: 980px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.hero {
+  margin: 8px 0 6px;
+  font-size: 27px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.hero b {
+  color: var(--accent);
 }
 
 .page .lede {
-  color: #9aa0a8;
-  margin: 0 0 18px;
+  color: var(--dim);
+  margin: 0 0 6px;
+  max-width: 760px;
 }
 
 .page h2 {
-  font-size: 15px;
-  margin: 22px 0 6px;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  margin: 30px 0 8px;
 }
 
-.page code,
-.page pre {
-  background: #1b1e24;
-  border: 1px solid #262a32;
-  border-radius: 6px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12.5px;
+.page p {
+  margin: 8px 0;
+  max-width: 760px;
 }
 
-.page code {
+code {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
   padding: 1px 5px;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 
-.page pre {
-  padding: 12px;
+pre {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px 15px;
   overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.65;
 }
 
-.page pre code {
+pre code {
   background: none;
   border: none;
   padding: 0;
@@ -134,107 +247,116 @@ a {
 .page th,
 .page td {
   text-align: left;
-  border-bottom: 1px solid #23262d;
-  padding: 7px 10px 7px 0;
+  border-bottom: 1px solid var(--line);
+  padding: 8px 12px 8px 0;
   vertical-align: top;
 }
 
-.page th {
-  color: #9aa0a8;
-  font-weight: 600;
+.page td:first-child {
+  color: var(--accent);
+  white-space: nowrap;
 }
 
-.toolframe-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.toolframe-head {
-  padding: 14px 26px 12px;
-  border-bottom: 1px solid #23262d;
-}
-
-.toolframe-head h1 {
-  margin: 0;
-  font-size: 17px;
-}
-
-.toolframe-head p {
-  margin: 4px 0 0;
-  color: #9aa0a8;
-}
-
+/* ---- embedded tool pages ---- */
 .toolframe {
   flex: 1;
   border: none;
   width: 100%;
-  background: #14161a;
+  background: var(--bg);
 }
 
+/* ---- controls (same recipe as the tools) ---- */
 button,
 select {
-  background: #1d2129;
-  color: #e8e8e8;
-  border: 1px solid #2b303a;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px 10px;
   font: inherit;
+  font-size: 12.5px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #242935;
+  border-color: var(--accent);
 }
 
 button.primary {
-  background: #2b4a76;
-  border-color: #3a6198;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 700;
 }
 
-button.primary:hover {
-  background: #33578a;
-}
-
-.editor-layout {
+/* ---- map editor ---- */
+.editor-body {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  gap: 16px;
   align-items: flex-start;
+  gap: 14px;
+  padding: 16px 28px 24px;
+}
+
+.editor-canvas-wrap {
+  flex: 1;
+  min-width: 0;
 }
 
 .editor-canvas {
-  background: #101216;
-  border: 1px solid #23262d;
+  display: block;
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 8px;
   cursor: crosshair;
-  max-width: 100%;
 }
 
 .editor-panel {
-  width: 240px;
+  width: 248px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #101216;
-  border: 1px solid #23262d;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px;
 }
 
-.editor-panel .muted {
-  color: #9aa0a8;
+.editor-panel h2 {
+  margin: 4px 0 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--dim);
   font-size: 12px;
 }
 
 .editor-panel textarea {
   width: 100%;
-  min-height: 90px;
-  background: #1b1e24;
-  color: #e8e8e8;
-  border: 1px solid #262a32;
+  min-height: 96px;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--line);
   border-radius: 6px;
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 11.5px;
   padding: 8px;
+}
+
+@media (max-width: 900px) {
+  .editor-body {
+    flex-direction: column;
+  }
+
+  .editor-panel {
+    width: 100%;
+  }
 }

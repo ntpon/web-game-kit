@@ -9,11 +9,9 @@
     --bg: #14151a; --panel: #1d1f26; --panel2: #23262f; --line: #2e323d;
     --ink: #e8eaf0; --dim: #8b90a0; --accent: #ffb648; --accent-ink: #1a1200;
   }
-  @media (prefers-color-scheme: light) {
-    :root { --bg: #f4f3ef; --panel: #fff; --panel2: #f0efe9; --line: #ddd9cf;
-            --ink: #23211c; --dim: #7b776b; --accent: #d97c00; --accent-ink: #fff; }
-  }
+  /* dark-only on purpose: matches the workbench shell and every other kit tool */
   * { box-sizing: border-box; margin: 0; }
+  body.embed header, body.embed footer { display: none; }
   body { background: var(--bg); color: var(--ink);
          font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
          min-height: 100vh; display: flex; flex-direction: column; }
@@ -87,6 +85,10 @@
   <span style="margin-left:auto">MIT · part of <a href="https://ntpon.com" style="color:inherit">web-game-kit</a> · by Nattapon Suetrong</span>
 </footer>
 <div id="toast">copied!</div>
+<script>
+  // inside the workbench the shell owns the header/footer
+  if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+</script>
 
 <script type="module">
 import * as J from './juice.js';

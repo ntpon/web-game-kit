@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PageHead from '../components/PageHead';
 
 export default function DesignDocPage() {
   const [text, setText] = useState('loading…');
@@ -12,25 +13,27 @@ export default function DesignDocPage() {
   }, []);
 
   return (
-    <div className="page">
-      <h1>Design doc template</h1>
-      <p className="lede">
-        One page you fill in before asking AI to write any code. If you can answer these, your
-        prompts stop being vague — copy it into your project as <code>DESIGN.md</code>.
-      </p>
-      <p>
-        <button
-          className="primary"
-          onClick={() => {
-            navigator.clipboard?.writeText(text).then(() => setCopied(true));
-          }}
-        >
-          {copied ? 'copied ✓' : 'Copy template'}
-        </button>
-      </p>
-      <pre>
-        <code>{text}</code>
-      </pre>
-    </div>
+    <>
+      <PageHead
+        title="Design doc template"
+        lede="One page you fill in before asking AI to write any code. If you can answer these, your prompts stop being vague."
+        artifact="DESIGN.md"
+      />
+      <div className="page">
+        <p>
+          <button
+            className="primary"
+            onClick={() => {
+              navigator.clipboard?.writeText(text).then(() => setCopied(true));
+            }}
+          >
+            {copied ? 'copied ✓' : 'Copy template'}
+          </button>
+        </p>
+        <pre>
+          <code>{text}</code>
+        </pre>
+      </div>
+    </>
   );
 }

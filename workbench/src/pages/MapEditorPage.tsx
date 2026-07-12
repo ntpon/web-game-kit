@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { MapEditor, relativeCell } from '../editor/mapEditor';
 import type { MapData } from '../editor/mapTypes';
 import MapCanvas, { type EditorMode } from '../editor/MapCanvas';
+import PageHead from '../components/PageHead';
+
+const LEDE =
+  'Place: click a tile to put down the selected item, click again to remove. ' +
+  'Collision: click the cells around a placed item to paint its buffer zone — every instance of that type shares the shape. ' +
+  'Drop the export into starter/src/config/map.json and walk around it.';
 
 export default function MapEditorPage() {
   const [map, setMap] = useState<MapData | null>(null);
@@ -29,10 +35,12 @@ export default function MapEditorPage() {
 
   if (!map || !editorRef.current) {
     return (
-      <div className="page">
-        <h1>Map editor</h1>
-        <p className="lede">loading…</p>
-      </div>
+      <>
+        <PageHead title="Map editor" lede={LEDE} artifact="map.json" />
+        <div className="page">
+          <p className="muted">loading the starter's map…</p>
+        </div>
+      </>
     );
   }
 
@@ -52,16 +60,9 @@ export default function MapEditorPage() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 'none' }}>
-      <h1>Map editor</h1>
-      <p className="lede">
-        <strong>Place</strong>: click a tile to place the selected item, click again to remove.{' '}
-        <strong>Collision</strong>: click the cells around a placed item to paint its buffer zone —
-        every instance of that type shares the shape. Export locks it all as JSON in the exact
-        format the starter loads: drop the file into <code>starter/src/config/map.json</code> and
-        walk around it.
-      </p>
-      <div className="editor-layout">
+    <>
+      <PageHead title="Map editor" lede={LEDE} artifact="map.json" />
+      <div className="editor-body">
         <MapCanvas
           map={map}
           version={version}
@@ -78,7 +79,7 @@ export default function MapEditorPage() {
           }}
         />
         <div className="editor-panel">
-          <strong>Mode</strong>
+          <h2>Mode</h2>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               className={mode === 'place' ? 'primary' : ''}
@@ -95,7 +96,7 @@ export default function MapEditorPage() {
               Collision
             </button>
           </div>
-          <strong>Item type</strong>
+          <h2>Item type</h2>
           <select
             value={selectedType}
             onChange={(e) => {
@@ -117,6 +118,7 @@ export default function MapEditorPage() {
                 ? `place a ${selectedType} first, then paint its cells`
                 : `${editor.shapeOf(selectedType).length} collision cells on every ${selectedType}`}
           </span>
+          <h2>Export</h2>
           <button
             className="primary"
             onClick={() => {
@@ -161,11 +163,11 @@ export default function MapEditorPage() {
           </button>
           <button onClick={loadDefault}>Reset to default map</button>
           <span className="muted">
-            The circle marks the spawn point. Same editor lives inside the starter (?edit=1) where
-            Save writes the file directly.
+            The circle marks the spawn point. The same editor lives inside the starter (?edit=1)
+            where Save writes the file directly.
           </span>
         </div>
       </div>
-    </div>
+    </>
   );
 }
