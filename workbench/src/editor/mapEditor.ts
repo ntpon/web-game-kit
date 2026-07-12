@@ -3,8 +3,17 @@
 import { shapeCells, type MapData, type MapItem } from './mapTypes';
 
 /**
+ * Collision cells are a buffer zone AROUND an item — clicks farther than this
+ * (Chebyshev distance) from the nearest instance are ignored. Without the cap,
+ * a distant click stores a huge offset that every other instance of the type
+ * re-applies, painting cells way off the map (and exporting invisible walls).
+ */
+export const MAX_SHAPE_REACH = 3;
+
+/**
  * A clicked world tile expressed relative to the nearest placed instance of
  * an item type — so painted cells travel with every instance of that type.
+ * Returns null when the click is too far from every instance to be a buffer.
  */
 export function relativeCell(
   map: MapData,
@@ -23,7 +32,10 @@ export function relativeCell(
       best = a;
     }
   }
-  return [tileX - Math.floor(best.x), tileY - Math.floor(best.y)];
+  const dx = tileX - Math.floor(best.x);
+  const dy = tileY - Math.floor(best.y);
+  if (Math.max(Math.abs(dx), Math.abs(dy)) > MAX_SHAPE_REACH) return null;
+  return [dx, dy];
 }
 
 /**

@@ -155,7 +155,11 @@ export default function MapCanvas(props: {
             : 'rgba(136, 136, 136, 0.22)'
           : 'rgba(255, 51, 85, 0.14)';
       for (const [dx, dy] of shapeCells(def)) {
-        tilePath(ctx, Math.floor(item.x) + dx, Math.floor(item.y) + dy);
+        const cx = Math.floor(item.x) + dx;
+        const cy = Math.floor(item.y) + dy;
+        // imported maps can carry stray offsets — never paint outside the grid
+        if (cx < 0 || cx >= map.grid.width || cy < 0 || cy >= map.grid.height) continue;
+        tilePath(ctx, cx, cy);
         ctx.fill();
       }
     }
