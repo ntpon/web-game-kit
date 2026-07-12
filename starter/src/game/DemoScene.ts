@@ -3,7 +3,7 @@ import gameConfig from '../config/game.json';
 import mapJson from '../config/map.json';
 import { tileToScreen } from './isoProjection';
 import { moveActor, type Blocker } from './movement';
-import type { MapData } from './mapTypes';
+import { shapeCells, type MapData } from './mapTypes';
 import { EditorOverlay } from './editorOverlay';
 
 // Terrain art is a 313x313 diamond drawn slightly larger than the 128x64
@@ -112,8 +112,13 @@ export class DemoScene extends Phaser.Scene {
         .setDepth(point.y);
       image.setScale(def.display / image.height);
       this.itemImages.push(image);
-      if (def.blocking) {
-        this.blockers.push({ x: item.x - 0.5, y: item.y - 0.5, width: 1, height: 1 });
+      for (const [dx, dy] of shapeCells(def)) {
+        this.blockers.push({
+          x: Math.floor(item.x) + dx,
+          y: Math.floor(item.y) + dy,
+          width: 1,
+          height: 1,
+        });
       }
     }
   }

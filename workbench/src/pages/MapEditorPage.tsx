@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapEditor } from '../editor/mapEditor';
+import { MapEditor, relativeCell } from '../editor/mapEditor';
 import type { MapData } from '../editor/mapTypes';
-import MapCanvas from '../editor/MapCanvas';
+import MapCanvas, { type EditorMode } from '../editor/MapCanvas';
 
 export default function MapEditorPage() {
   const [map, setMap] = useState<MapData | null>(null);
   const [selectedType, setSelectedType] = useState('');
+  const [mode, setMode] = useState<EditorMode>('place');
   const [version, setVersion] = useState(0);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
@@ -54,13 +55,46 @@ export default function MapEditorPage() {
     <div className="page" style={{ maxWidth: 'none' }}>
       <h1>Map editor</h1>
       <p className="lede">
-        Click a tile to place the selected item — click an occupied tile to remove. Export locks
-        the layout as JSON in the exact format the starter loads: drop the file into{' '}
-        <code>starter/src/config/map.json</code> and walk around it.
+        <strong>Place</strong>: click a tile to place the selected item, click again to remove.{' '}
+        <strong>Collision</strong>: click the cells around a placed item to paint its buffer zone —
+        every instance of that type shares the shape. Export locks it all as JSON in the exact
+        format the starter loads: drop the file into <code>starter/src/config/map.json</code> and
+        walk around it.
       </p>
       <div className="editor-layout">
-        <MapCanvas map={map} editor={editor} version={version} onEdit={bump} />
+        <MapCanvas
+          map={map}
+          version={version}
+          mode={mode}
+          selectedType={selectedType}
+          onTileClick={(tile) => {
+            if (mode === 'place') {
+              editor.toggle(tile.x, tile.y);
+            } else {
+              const cell = relativeCell(map, selectedType, tile.x, tile.y);
+              if (cell) editor.toggleShapeCell(selectedType, cell[0], cell[1]);
+            }
+            bump();
+          }}
+        />
         <div className="editor-panel">
+          <strong>Mode</strong>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              className={mode === 'place' ? 'primary' : ''}
+              style={{ flex: 1 }}
+              onClick={() => setMode('place')}
+            >
+              Place
+            </button>
+            <button
+              className={mode === 'collision' ? 'primary' : ''}
+              style={{ flex: 1 }}
+              onClick={() => setMode('collision')}
+            >
+              Collision
+            </button>
+          </div>
           <strong>Item type</strong>
           <select
             value={selectedType}
@@ -77,7 +111,11 @@ export default function MapEditorPage() {
             ))}
           </select>
           <span className="muted">
-            {editor.count(selectedType)} placed · {map.items.length} total
+            {mode === 'place'
+              ? `${editor.count(selectedType)} placed · ${map.items.length} total`
+              : editor.count(selectedType) === 0
+                ? `place a ${selectedType} first, then paint its cells`
+                : `${editor.shapeOf(selectedType).length} collision cells on every ${selectedType}`}
           </span>
           <button
             className="primary"
@@ -114,11 +152,12 @@ export default function MapEditorPage() {
           )}
           <button
             onClick={() => {
-              editor.clearType(selectedType);
+              if (mode === 'place') editor.clearType(selectedType);
+              else editor.clearShape(selectedType);
               bump();
             }}
           >
-            Clear this type
+            {mode === 'place' ? 'Clear this type' : 'Clear collision cells'}
           </button>
           <button onClick={loadDefault}>Reset to default map</button>
           <span className="muted">

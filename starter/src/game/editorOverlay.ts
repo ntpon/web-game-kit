@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { MapEditor } from './mapEditor';
-import type { MapData } from './mapTypes';
+import { shapeCells, type MapData } from './mapTypes';
 import { screenToTile, tileToScreen } from './isoProjection';
 
 export interface EditorDeps {
@@ -77,10 +77,18 @@ export class EditorOverlay {
       }
     }
 
-    // occupied tiles (orange) + hover (white)
+    // occupied tiles (orange), collision cells (red) + hover (white)
     g.fillStyle(0xffaa33, 0.25);
     for (const item of this.deps.map.items) {
       this.fillTile(g, Math.floor(item.x), Math.floor(item.y));
+    }
+    g.fillStyle(0xff3355, 0.2);
+    for (const item of this.deps.map.items) {
+      const def = this.deps.map.itemTypes[item.type];
+      if (!def) continue;
+      for (const [dx, dy] of shapeCells(def)) {
+        this.fillTile(g, Math.floor(item.x) + dx, Math.floor(item.y) + dy);
+      }
     }
     if (this.hoverTile) {
       g.fillStyle(0xffffff, 0.18);

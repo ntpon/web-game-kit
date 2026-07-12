@@ -19,7 +19,11 @@
     "stall": {
       "texture": "prop-stall",
       "display": 170,
-      "blocking": true
+      "blocking": true,
+      "shape": [
+        [0, 0],
+        [-1, 0]
+      ]
     },
     "crates": {
       "texture": "prop-crates",

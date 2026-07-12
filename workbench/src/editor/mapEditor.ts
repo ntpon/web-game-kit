@@ -1,5 +1,30 @@
-// Kept in sync with starter/src/game/mapEditor.ts
-import type { MapData, MapItem } from './mapTypes';
+// Kept in sync with starter/src/game/mapEditor.ts (plus collision-shape ops,
+// which follow the collision editor this tool was extracted from)
+import { shapeCells, type MapData, type MapItem } from './mapTypes';
+
+/**
+ * A clicked world tile expressed relative to the nearest placed instance of
+ * an item type — so painted cells travel with every instance of that type.
+ */
+export function relativeCell(
+  map: MapData,
+  type: string,
+  tileX: number,
+  tileY: number,
+): [number, number] | null {
+  const anchors = map.items.filter((item) => item.type === type);
+  if (anchors.length === 0) return null;
+  let best = anchors[0];
+  let bestDist = Infinity;
+  for (const a of anchors) {
+    const d = (Math.floor(a.x) - tileX) ** 2 + (Math.floor(a.y) - tileY) ** 2;
+    if (d < bestDist) {
+      bestDist = d;
+      best = a;
+    }
+  }
+  return [tileX - Math.floor(best.x), tileY - Math.floor(best.y)];
+}
 
 /**
  * Pure editor model (no canvas, no DOM) — the page renders it, this owns
@@ -44,6 +69,27 @@ export class MapEditor {
     for (let i = this.items.length - 1; i >= 0; i -= 1) {
       if (this.items[i].type === type) this.items.splice(i, 1);
     }
+  }
+
+  shapeOf(type: string): number[][] {
+    const def = this.map.itemTypes[type];
+    return def ? shapeCells(def) : [];
+  }
+
+  /** paint/erase one collision cell of a type (relative to its anchor tile) */
+  toggleShapeCell(type: string, dx: number, dy: number): void {
+    const def = this.map.itemTypes[type];
+    if (!def) return;
+    const cells = shapeCells(def).map((c) => [...c]);
+    const i = cells.findIndex((c) => c[0] === dx && c[1] === dy);
+    if (i >= 0) cells.splice(i, 1);
+    else cells.push([dx, dy]);
+    def.shape = cells;
+  }
+
+  clearShape(type: string): void {
+    const def = this.map.itemTypes[type];
+    if (def) def.shape = [];
   }
 
   /** The whole map (grid + legend + terrain + items) — what Export produces. */

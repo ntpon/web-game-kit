@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { MapData } from './mapTypes';
-import type { MapEditor } from './mapEditor';
+import { shapeCells, type MapData } from './mapTypes';
 import { tileToScreen, screenToTile, HALF_TILE_W, HALF_TILE_H } from './isoProjection';
 
 // texture key → asset path (mirrors the starter's preload)
@@ -20,13 +19,16 @@ const W = 640;
 const H = 440;
 const PAD = 10;
 
+export type EditorMode = 'place' | 'collision';
+
 export default function MapCanvas(props: {
   map: MapData;
-  editor: MapEditor;
   version: number;
-  onEdit: () => void;
+  mode: EditorMode;
+  selectedType: string;
+  onTileClick: (tile: { x: number; y: number }) => void;
 }) {
-  const { map, editor, version, onEdit } = props;
+  const { map, version, mode, selectedType, onTileClick } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef(new Map<string, HTMLImageElement>());
   const [loadTick, setLoadTick] = useState(0);
@@ -96,7 +98,7 @@ export default function MapCanvas(props: {
       });
     });
 
-    // grid + occupied tiles
+    // grid
     ctx.lineWidth = 1;
     ctx.strokeStyle = 'rgba(0, 255, 255, 0.10)';
     for (let ty = 0; ty < map.grid.height; ty += 1) {
@@ -105,17 +107,37 @@ export default function MapCanvas(props: {
         ctx.stroke();
       }
     }
-    ctx.fillStyle = 'rgba(255, 170, 51, 0.18)';
+
+    // item anchors (orange, place mode only)
+    if (mode === 'place') {
+      ctx.fillStyle = 'rgba(255, 170, 51, 0.18)';
+      for (const item of map.items) {
+        tilePath(ctx, Math.floor(item.x), Math.floor(item.y));
+        ctx.fill();
+      }
+    }
+
+    // collision cells: red for the selected type in collision mode,
+    // grey for the rest, faint red everywhere in place mode
     for (const item of map.items) {
-      tilePath(ctx, Math.floor(item.x), Math.floor(item.y));
-      ctx.fill();
+      const def = map.itemTypes[item.type];
+      if (!def) continue;
+      const selected = item.type === selectedType;
+      ctx.fillStyle =
+        mode === 'collision'
+          ? selected
+            ? 'rgba(255, 51, 85, 0.42)'
+            : 'rgba(136, 136, 136, 0.22)'
+          : 'rgba(255, 51, 85, 0.14)';
+      for (const [dx, dy] of shapeCells(def)) {
+        tilePath(ctx, Math.floor(item.x) + dx, Math.floor(item.y) + dy);
+        ctx.fill();
+      }
     }
 
     // spawn marker
-    const spawn = toCanvas(
-      tileToScreen(map.spawn.x, map.spawn.y, 0, 0).x,
-      tileToScreen(map.spawn.x, map.spawn.y, 0, 0).y,
-    );
+    const spawnP = tileToScreen(map.spawn.x, map.spawn.y, 0, 0);
+    const spawn = toCanvas(spawnP.x, spawnP.y);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.beginPath();
     ctx.arc(spawn.x, spawn.y, 5, 0, Math.PI * 2);
@@ -132,7 +154,9 @@ export default function MapCanvas(props: {
       if (img.complete && img.naturalWidth > 0) {
         const h = def.display * scale;
         const w = (h * img.naturalWidth) / img.naturalHeight;
+        ctx.globalAlpha = mode === 'collision' ? 0.75 : 1;
         ctx.drawImage(img, c.x - w / 2, c.y - h * 0.85, w, h);
+        ctx.globalAlpha = 1;
       } else {
         tilePath(ctx, Math.floor(item.x), Math.floor(item.y));
         ctx.fillStyle = 'rgba(122, 184, 255, 0.5)';
@@ -150,7 +174,7 @@ export default function MapCanvas(props: {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
       ctx.fill();
     }
-  }, [map, version, hover, loadTick, scale]);
+  }, [map, version, hover, loadTick, scale, mode, selectedType]);
 
   const pointerTile = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -176,9 +200,7 @@ export default function MapCanvas(props: {
       onMouseLeave={() => setHover(null)}
       onClick={(e) => {
         const t = pointerTile(e);
-        if (!inBounds(t)) return;
-        editor.toggle(t.x, t.y);
-        onEdit();
+        if (inBounds(t)) onTileClick(t);
       }}
     />
   );
