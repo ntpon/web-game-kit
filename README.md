@@ -28,6 +28,8 @@ Everything here is small, self-contained, and usable in minutes.
 
 ## Quick start
 
+**Try it online first: [kit.ntpon.com](https://kit.ntpon.com)** — the workbench, nothing to install.
+
 ```bash
 git clone https://github.com/ntpon/web-game-kit
 cd web-game-kit/workbench && pnpm install && pnpm dev   # all tools in one web app
