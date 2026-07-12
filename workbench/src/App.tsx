@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ReactElement } from 'react';
 import GettingStarted from './pages/GettingStarted';
 import MapEditorPage from './pages/MapEditorPage';
 import ToolFramePage from './pages/ToolFramePage';
 import AssetsAiPage from './pages/AssetsAiPage';
 import DesignDocPage from './pages/DesignDocPage';
+import { currentTheme, setTheme, subscribeTheme } from './theme';
 
 type Route = {
   hash: string;
@@ -25,7 +26,7 @@ const ROUTES: Route[] = [
       <ToolFramePage
         title="Sprite preview"
         lede="The bundled 4-frame walk starts playing on open. Drop in your own AI-generated sheet and catch drift — swapped legs, size wobble, floating feet — the moment it moves."
-        artifact="config JSON + a verified sheet"
+        artifact="config JSON + verified sheet"
         src="tools/sprite-preview/index.html"
       />
     ),
@@ -48,6 +49,28 @@ const ROUTES: Route[] = [
 function currentHash(): string {
   const h = window.location.hash || '#/';
   return ROUTES.some((r) => r.hash === h) ? h : '#/';
+}
+
+function ThemeToggle() {
+  const theme = useSyncExternalStore(subscribeTheme, currentTheme);
+  return (
+    <div className="seg theme-seg" role="group" aria-label="Color theme">
+      <button
+        className={theme === 'light' ? 'on' : ''}
+        aria-pressed={theme === 'light'}
+        onClick={() => setTheme('light')}
+      >
+        ☀ Light
+      </button>
+      <button
+        className={theme === 'dark' ? 'on' : ''}
+        aria-pressed={theme === 'dark'}
+        onClick={() => setTheme('dark')}
+      >
+        ☾ Dark
+      </button>
+    </div>
+  );
 }
 
 export default function App() {
@@ -82,10 +105,9 @@ export default function App() {
         {nav('learn')}
         <div className="section">Tools</div>
         {nav('tools')}
+        <ThemeToggle />
         <div className="foot">
-          MIT · by <a href="https://ntpon.com">Nattapon Suetrong</a>
-          <br />
-          <a href="https://github.com/ntpon/web-game-kit">GitHub</a>
+          <a href="https://github.com/ntpon/web-game-kit">GitHub</a> · MIT license
         </div>
       </nav>
       <main className="content">{route.render()}</main>

@@ -30,11 +30,11 @@ export default function App() {
         </span>
       </header>
       <div ref={mountRef} style={{ marginTop: 10 }} />
-      <p style={{ color: '#8b90a0' }}>
+      <p style={{ color: '#9aa1b3' }}>
         Every number lives in <code>src/config/*.json</code> — edit while <code>pnpm dev</code> runs
-        and the page reloads on your change. Part of web-game-kit · by{' '}
-        <a href="https://ntpon.com" style={{ color: '#8b90a0' }}>
-          Nattapon Suetrong
+        and the page reloads on your change. Part of{' '}
+        <a href="https://github.com/ntpon/web-game-kit" style={{ color: '#9aa1b3' }}>
+          web-game-kit
         </a>
         .
       </p>

@@ -80,17 +80,17 @@ export default function MapEditorPage() {
         />
         <div className="editor-panel">
           <h2>Mode</h2>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div className="seg" role="group" aria-label="Editor mode">
             <button
-              className={mode === 'place' ? 'primary' : ''}
-              style={{ flex: 1 }}
+              className={mode === 'place' ? 'on' : ''}
+              aria-pressed={mode === 'place'}
               onClick={() => setMode('place')}
             >
               Place
             </button>
             <button
-              className={mode === 'collision' ? 'primary' : ''}
-              style={{ flex: 1 }}
+              className={mode === 'collision' ? 'on' : ''}
+              aria-pressed={mode === 'collision'}
               onClick={() => setMode('collision')}
             >
               Collision
@@ -152,7 +152,9 @@ export default function MapEditorPage() {
               </button>
             </>
           )}
+          <h2>Reset</h2>
           <button
+            className="quiet"
             onClick={() => {
               if (mode === 'place') editor.clearType(selectedType);
               else editor.clearShape(selectedType);
@@ -161,7 +163,9 @@ export default function MapEditorPage() {
           >
             {mode === 'place' ? 'Clear this type' : 'Clear collision cells'}
           </button>
-          <button onClick={loadDefault}>Reset to default map</button>
+          <button className="quiet" onClick={loadDefault}>
+            Reset to default map
+          </button>
           <span className="muted">
             The circle marks the spawn point. The same editor lives inside the starter (?edit=1)
             where Save writes the file directly.

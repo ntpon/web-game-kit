@@ -29,4 +29,4 @@ Try it now with the included `sample/walk.png` + `sample/walk.json`
 | Frame stepping + filmstrip | the one bad frame in an otherwise fine cycle |
 | Copy config JSON | grid/fps/range config, ready to paste into your game |
 
-MIT · part of web-game-kit
+MIT · part of [web-game-kit](https://github.com/ntpon/web-game-kit)

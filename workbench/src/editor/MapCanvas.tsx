@@ -48,6 +48,13 @@ export default function MapCanvas(props: {
     return () => observer.disconnect();
   }, []);
 
+  // overlay colors are theme-dependent — repaint when the shell switches theme
+  useEffect(() => {
+    const repaint = () => setLoadTick((t) => t + 1);
+    window.addEventListener('wgk-theme', repaint);
+    return () => window.removeEventListener('wgk-theme', repaint);
+  }, []);
+
   const W = size.w;
   const H = size.h;
   const worldW = (map.grid.width + map.grid.height) * HALF_TILE_W;
@@ -100,6 +107,8 @@ export default function MapCanvas(props: {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
+    const light = document.documentElement.dataset.theme === 'light';
+
     // terrain
     map.terrain.forEach((row, y) => {
       [...row].forEach((symbol, x) => {
@@ -116,7 +125,7 @@ export default function MapCanvas(props: {
 
     // grid
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0, 255, 255, 0.10)';
+    ctx.strokeStyle = light ? 'rgba(20, 80, 100, 0.18)' : 'rgba(0, 255, 255, 0.10)';
     for (let ty = 0; ty < map.grid.height; ty += 1) {
       for (let tx = 0; tx < map.grid.width; tx += 1) {
         tilePath(ctx, tx, ty);
@@ -154,7 +163,7 @@ export default function MapCanvas(props: {
     // spawn marker
     const spawnP = tileToScreen(map.spawn.x, map.spawn.y, 0, 0);
     const spawn = toCanvas(spawnP.x, spawnP.y);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.strokeStyle = light ? 'rgba(20, 24, 40, 0.75)' : 'rgba(255, 255, 255, 0.8)';
     ctx.beginPath();
     ctx.arc(spawn.x, spawn.y, 5, 0, Math.PI * 2);
     ctx.stroke();
@@ -177,7 +186,7 @@ export default function MapCanvas(props: {
         tilePath(ctx, Math.floor(item.x), Math.floor(item.y));
         ctx.fillStyle = 'rgba(255, 182, 72, 0.5)';
         ctx.fill();
-        ctx.fillStyle = '#e8eaf0';
+        ctx.fillStyle = light ? '#20242f' : '#e8eaf0';
         ctx.font = '10px ui-monospace, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(item.type, c.x, c.y);
@@ -187,7 +196,7 @@ export default function MapCanvas(props: {
     // hover highlight
     if (hover) {
       tilePath(ctx, hover.x, hover.y);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+      ctx.fillStyle = light ? 'rgba(20, 24, 40, 0.12)' : 'rgba(255, 255, 255, 0.16)';
       ctx.fill();
     }
   }, [map, version, hover, loadTick, scale, mode, selectedType, W, H]);

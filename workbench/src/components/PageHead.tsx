@@ -11,8 +11,8 @@ export default function PageHead(props: { title: string; lede: string; artifact?
         <p className="lede">{props.lede}</p>
       </div>
       {props.artifact && (
-        <span className="chip">
-          <span className="lbl">→ hand your AI </span>
+        <span className="chip" title="What this page produces for your AI agent">
+          <span className="lbl">hand your AI</span>
           <span className="art">{props.artifact}</span>
         </span>
       )}

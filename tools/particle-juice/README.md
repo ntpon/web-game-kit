@@ -32,4 +32,4 @@ if 70 ms of hit-stop feels right. Open **`demo.html`** (serve the folder over ht
 fire effects at a walking sprite, drag the sliders, then **Copy options JSON**
 and paste the tuned values into your game.
 
-MIT · part of web-game-kit · by [Nattapon Suetrong](https://ntpon.com)
+MIT · part of [web-game-kit](https://github.com/ntpon/web-game-kit)

@@ -30,4 +30,4 @@ skills trigger on their own.
 Pair with the kit's `tools/sprite-preview/` to eyeball every AI-generated
 animation before it enters your game.
 
-MIT · part of web-game-kit · by [Nattapon Suetrong](https://ntpon.com)
+MIT · part of [web-game-kit](https://github.com/ntpon/web-game-kit)
