@@ -1,0 +1,6 @@
+node_modules/
+dist/
+public/tools/
+public/assets/
+public/map-default.json
+public/design-doc-template.md

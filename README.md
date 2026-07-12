@@ -10,6 +10,7 @@ Everything here is small, self-contained, and usable in minutes.
 
 | | What it does |
 |---|---|
+| [`workbench/`](workbench/) | **start here** — one admin-style web app with a side menu that hosts everything below: guides, the map editor, sprite preview, and particle juice |
 | [`starter/`](starter/) | React + Phaser isometric starter — walk around a small market scene, every number in JSON configs, with a built-in map editor (`?edit=1`) that writes placements back to `src/config/map.json` |
 | [`tools/sprite-preview/`](tools/sprite-preview/) | one HTML file that catches AI spritesheet drift (swapped legs, size wobble, floating feet) before it hits your game |
 | [`tools/particle-juice/`](tools/particle-juice/) | copy-paste juice helpers for Phaser 4 — floating text, screen shake, hit-stop, dust/poof/spark particles, plus a feel-tuning demo |
@@ -20,7 +21,8 @@ Everything here is small, self-contained, and usable in minutes.
 
 ```bash
 git clone https://github.com/ntpon/web-game-kit
-cd web-game-kit/starter && pnpm install && pnpm dev   # walkable demo → http://localhost:5173
+cd web-game-kit/workbench && pnpm install && pnpm dev   # all tools in one web app
+cd ../starter && pnpm install && pnpm dev               # walkable demo → :5173
 ```
 
 No-install option: open `tools/sprite-preview/index.html` and drag in `sample/walk.png`.
