@@ -33,8 +33,9 @@
   button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
   button.toggled { outline: 2px solid var(--accent); }
   .fire { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  #stagewrap { display: flex; align-items: center; justify-content: center; padding: 16px; }
-  #game { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  #stagewrap { display: flex; align-items: center; justify-content: center; padding: 16px; min-height: 0; }
+  #game { border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+          width: 100%; max-width: 1100px; aspect-ratio: 8 / 5; height: auto; max-height: 100%; }
   footer { padding: 8px 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 11.5px; display: flex; gap: 16px; }
   #toast { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
            background: var(--accent); color: var(--accent-ink); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: none; }
@@ -139,6 +140,7 @@ class Demo extends Phaser.Scene {
 new Phaser.Game({
   type: Phaser.AUTO, parent: 'game', width: W, height: H,
   backgroundColor: '#1a1c22', scene: Demo, pixelArt: true,
+  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
 });
 
 const FX = {
