@@ -1,0 +1,14 @@
+{
+  "player": {
+    "walkSpeed": 2.4,
+    "sprintSpeed": 3.9,
+    "actorRadius": 0.32,
+    "displayHeight": 112
+  },
+  "camera": {
+    "zoom": 1
+  },
+  "animation": {
+    "walkFrameRate": 8
+  }
+}

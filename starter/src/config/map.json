@@ -1,0 +1,99 @@
+{
+  "name": "demo-market",
+  "grid": {
+    "width": 16,
+    "height": 16
+  },
+  "legend": {
+    "m": {
+      "texture": "terrain-moss"
+    },
+    "s": {
+      "texture": "terrain-paver"
+    },
+    "b": {
+      "texture": "terrain-brick"
+    }
+  },
+  "itemTypes": {
+    "stall": {
+      "texture": "prop-stall",
+      "display": 170,
+      "blocking": true
+    },
+    "crates": {
+      "texture": "prop-crates",
+      "display": 96,
+      "blocking": true
+    },
+    "jar": {
+      "texture": "prop-jar",
+      "display": 70,
+      "blocking": true
+    },
+    "lantern": {
+      "texture": "prop-lantern",
+      "display": 130,
+      "blocking": false
+    }
+  },
+  "terrain": [
+    "mmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmbbbbbbbbbbbbmm",
+    "mmbbbbbbbbbbbbmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmsssssbbsssssmm",
+    "mmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmm"
+  ],
+  "items": [
+    {
+      "type": "stall",
+      "x": 4.5,
+      "y": 3.5
+    },
+    {
+      "type": "stall",
+      "x": 11.5,
+      "y": 3.5
+    },
+    {
+      "type": "crates",
+      "x": 3.5,
+      "y": 10.5
+    },
+    {
+      "type": "jar",
+      "x": 12.5,
+      "y": 10.5
+    },
+    {
+      "type": "lantern",
+      "x": 2.5,
+      "y": 2.5
+    },
+    {
+      "type": "lantern",
+      "x": 13.5,
+      "y": 12.5
+    },
+    {
+      "type": "stall",
+      "x": 10.5,
+      "y": 2.5
+    }
+  ],
+  "spawn": {
+    "x": 8,
+    "y": 8
+  }
+}
