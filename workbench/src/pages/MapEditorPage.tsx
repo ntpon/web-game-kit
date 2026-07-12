@@ -140,6 +140,12 @@ export default function MapEditorPage() {
                 onClick={() => {
                   try {
                     editor.fromJSON(importText);
+                    // imported itemTypes may not contain the current selection
+                    if (!map.itemTypes[selectedType]) {
+                      const first = Object.keys(map.itemTypes)[0] ?? '';
+                      setSelectedType(first);
+                      editor.selectedType = first;
+                    }
                     setShowImport(false);
                     setImportText('');
                     bump();

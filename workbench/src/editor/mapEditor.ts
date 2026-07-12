@@ -114,6 +114,19 @@ export class MapEditor {
     const parsed = JSON.parse(text) as Partial<MapData> | MapItem[];
     const items = Array.isArray(parsed) ? parsed : parsed.items;
     if (!Array.isArray(items)) throw new Error('no items array in JSON');
+    if (!Array.isArray(parsed)) {
+      // full map: adopt everything the paste carries, not just items —
+      // otherwise re-importing an export silently drops painted collision
+      // shapes (itemTypes) and the terrain it was authored on
+      if (parsed.name) this.map.name = parsed.name;
+      if (parsed.grid?.width && parsed.grid?.height) {
+        this.map.grid = { width: parsed.grid.width, height: parsed.grid.height };
+      }
+      if (parsed.legend) this.map.legend = parsed.legend;
+      if (parsed.itemTypes) this.map.itemTypes = parsed.itemTypes;
+      if (Array.isArray(parsed.terrain)) this.map.terrain = parsed.terrain;
+      if (parsed.spawn) this.map.spawn = parsed.spawn;
+    }
     this.items.splice(0, this.items.length, ...items);
   }
 }
