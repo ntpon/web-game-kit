@@ -6,6 +6,11 @@ online survival game, and given away so your next game starts faster.
 
 Everything here is small, self-contained, and usable in minutes.
 
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/workbench-light.png">
+  <img alt="the workbench — every kit tool in one web app, in your choice of dark or light" src="docs/workbench-dark.png">
+</picture>
+
 ## What's inside
 
 | | What it does |
@@ -16,6 +21,10 @@ Everything here is small, self-contained, and usable in minutes.
 | [`tools/particle-juice/`](tools/particle-juice/) | copy-paste juice helpers for Phaser 4 — floating text, screen shake, hit-stop, dust/poof/spark particles, plus a feel-tuning demo |
 | [`tools/design-doc-template.md`](tools/design-doc-template.md) | the one-page design doc to fill in before you ask AI to write any code |
 | [`skills/`](skills/) | Claude Code skills that let Claude hand image work to Codex: general image generation + game-ready asset pipeline (magenta-key transparency, spritesheet slicing) |
+
+| walk around the starter | catch spritesheet drift | tune the juice |
+|---|---|---|
+| ![isometric market scene from the starter](docs/starter.png) | ![sprite-preview playing an AI walk cycle](tools/sprite-preview/screenshot.png) | ![particle-juice firing money text, sparks and dust](tools/particle-juice/screenshot.png) |
 
 ## Quick start
 
