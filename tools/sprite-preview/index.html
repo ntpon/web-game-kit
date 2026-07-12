@@ -87,6 +87,7 @@
       <div class="row">
         <button id="btnOpen">Open PNG…</button>
         <button id="btnOpenJson">Open JSON…</button>
+        <button id="btnSample">Load sample</button>
       </div>
       <div class="stat">or drag &amp; drop files anywhere<br>(.png sheet + optional .json metadata)</div>
     </div>
@@ -447,8 +448,21 @@
   });
 
   window.addEventListener('resize', drawAll);
+
+  /* ---------- bundled sample (needs http; file:// falls back to drag & drop) ---------- */
+  async function loadSample() {
+    const jr = await fetch('sample/walk.json');
+    if (!jr.ok) throw new Error('sample metadata not found');
+    applyJson(await jr.json(), 'sample/walk.json');
+    await loadImage('sample/walk.png', 'sample/walk.png (bundled)');
+    S.playing = true; syncPlayBtn();
+  }
+  $('btnSample').onclick = () =>
+    loadSample().catch(() => alert('Sample needs this folder served over http (it ships in sample/).'));
+  if (location.protocol !== 'file:') loadSample().catch(() => {});
+
   // test hook (used by automated checks; harmless for humans)
-  window.__sp = { state: S, handleFiles, applyJson, loadImage, drawAll };
+  window.__sp = { state: S, handleFiles, applyJson, loadImage, drawAll, loadSample };
 })();
 </script>
 </body>
