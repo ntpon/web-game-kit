@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build && node scripts/check-no-dash.mjs",
+    "preview": "vite preview",
+    "test": "node --test scripts/check-no-dash.test.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
