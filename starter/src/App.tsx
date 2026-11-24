@@ -17,7 +17,7 @@ export default function App() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
         <strong>web-game-starter</strong>
         <span>
-          arrows / WASD to move · Shift to sprint ·{' '}
+          arrows / WASD to move | Shift to sprint |{' '}
           {editing ? (
             <a href="./" style={{ color: '#ffb648' }}>
               exit edit mode
@@ -31,7 +31,7 @@ export default function App() {
       </header>
       <div ref={mountRef} style={{ marginTop: 10 }} />
       <p style={{ color: '#9aa1b3' }}>
-        Every number lives in <code>src/config/*.json</code> — edit while <code>pnpm dev</code> runs
+        Every number lives in <code>src/config/*.json</code> - edit while <code>pnpm dev</code> runs
         and the page reloads on your change. Part of{' '}
         <a href="https://github.com/ntpon/web-game-kit" style={{ color: '#9aa1b3' }}>
           web-game-kit

@@ -4,7 +4,7 @@
 
 Game engines ship a particle system; the web doesn't. This is the missing piece:
 copy `juice.js` (or `juice.ts`) into your game and every hit, pickup and spawn
-gets feedback — no image files, no dependencies. Particle textures are generated in code.
+gets feedback - no image files, no dependencies. Particle textures are generated in code.
 
 ![particle-juice demo: floating money text, poof cloud and dust over a walking vendor sprite](screenshot.png)
 
@@ -21,15 +21,15 @@ gets feedback — no image files, no dependencies. Particle textures are generat
 | `dust(scene, x, y)` | footstep dust puffs |
 | `poof(scene, x, y)` | spawn/despawn smoke cloud |
 | `spark(scene, x, y)` | pickup/critical spark burst |
-| `trail(scene, target)` | dash/projectile trail — call `.stop()` when done |
+| `trail(scene, target)` | dash/projectile trail - call `.stop()` when done |
 
 Every effect cleans up after itself. Every option has a tuned default.
 
 ## Tune the feel (the human part)
 
-AI can wire these calls into your game in one pass — but only your hands can tell
+AI can wire these calls into your game in one pass - but only your hands can tell
 if 70 ms of hit-stop feels right. Open **`demo.html`** (serve the folder over http),
 fire effects at a walking sprite, drag the sliders, then **Copy options JSON**
 and paste the tuned values into your game.
 
-MIT · part of [web-game-kit](https://github.com/ntpon/web-game-kit)
+MIT | part of [web-game-kit](https://github.com/ntpon/web-game-kit)
