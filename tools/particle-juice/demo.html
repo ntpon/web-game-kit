@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:,">
-<title>particle-juice — feel-tuning demo</title>
+<title>particle-juice - feel-tuning demo</title>
 <script>
 // set the theme before first paint so a light-mode OS never flashes dark
-// ('wgk-theme' is shared with the workbench shell — same origin, same key)
+// ('wgk-theme' is shared with the workbench shell - same origin, same key)
 try {
   var t = localStorage.getItem('wgk-theme');
   if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -25,7 +25,7 @@ try {
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   }
   /* light theme: same amber brand for fills, darker amber for text on white.
-     The Phaser stage itself stays dark in both themes — it's the game's screen. */
+     The Phaser stage itself stays dark in both themes - it's the game's screen. */
   :root[data-theme="light"] {
     color-scheme: light;
     --bg: #f3f4f8; --panel: #ffffff; --raised: #e9ecf2; --line: #dfe2ea; --line2: #c6ccd8;
@@ -33,7 +33,7 @@ try {
     --tint: rgba(164, 93, 7, .1);
     --shadow: 0 8px 24px rgba(15, 20, 40, .18);
   }
-  /* the tool matches the workbench shell — one 'wgk-theme' key drives both */
+  /* the tool matches the workbench shell - one 'wgk-theme' key drives both */
   * { box-sizing: border-box; margin: 0; scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
   body.embed header { display: none; }
   body { background: var(--bg); color: var(--ink);
@@ -67,7 +67,7 @@ try {
   button:active { transform: translateY(1px); }
   button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
   button.toggled { border-color: var(--accent); color: var(--accent-text); background: var(--tint); }
-  /* the buttons are named after the helpers they call — copy-paste API, so code voice */
+  /* the buttons are named after the helpers they call - copy-paste API, so code voice */
   .fire { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 6px; }
   .fire button { font: 500 12px var(--mono); min-height: 32px; line-height: 1.25; padding: 5px 6px; white-space: nowrap; }
   .fire button.primary { font-weight: 700; }
@@ -85,8 +85,8 @@ try {
 </head>
 <body>
 <header>
-  <h1><b>particle-juice</b> — Phaser juice helpers, feel-tuning demo</h1>
-  <span class="hint">AI can set the numbers — only your hands can tell if they feel right</span>
+  <h1><b>particle-juice</b> - Phaser juice helpers, feel-tuning demo</h1>
+  <span class="hint">AI can set the numbers - only your hands can tell if they feel right</span>
   <button id="btnTheme" class="themebtn"></button>
 </header>
 <main>
@@ -125,9 +125,9 @@ try {
   <div id="stagewrap"><div id="game"></div></div>
 </main>
 <footer>
-  <span>the sprite walks on its own — fire effects at it</span>
+  <span>the sprite walks on its own - fire effects at it</span>
   <span>buttons are named after the helpers in <code>juice.ts</code></span>
-  <span style="margin-left:auto">MIT · <a href="https://github.com/ntpon/web-game-kit">web-game-kit</a></span>
+  <span style="margin-left:auto">MIT | <a href="https://github.com/ntpon/web-game-kit">web-game-kit</a></span>
 </footer>
 <div id="toast" role="status">Copied options JSON</div>
 <script>

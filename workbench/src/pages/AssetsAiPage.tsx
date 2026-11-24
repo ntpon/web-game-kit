@@ -5,7 +5,7 @@ export default function AssetsAiPage() {
     <>
       <PageHead
         title="AI asset workflow"
-        lede="Two Claude Code skills that give Claude real image-generation hands by delegating to the Codex CLI — plus a deterministic CLI that makes the output game-ready."
+        lede="Two Claude Code skills that give Claude real image-generation hands by delegating to the Codex CLI - plus a deterministic CLI that makes the output game-ready."
         artifact="skills/ installed in your agent"
       />
       <div className="page">
@@ -16,7 +16,7 @@ python3 -m pip install -r skills/game-asset/scripts/requirements.txt
 # requires the Codex CLI installed and logged in (codex login)`}</code>
         </pre>
         <p>
-          Restart your Claude Code session, then ask for a sprite, tileset, icon, or background —
+          Restart your Claude Code session, then ask for a sprite, tileset, icon, or background -
           the skills trigger on their own.
         </p>
 
@@ -26,7 +26,7 @@ python3 -m pip install -r skills/game-asset/scripts/requirements.txt
             <tr>
               <td>magenta key</td>
               <td>
-                Image models cannot produce real alpha transparency — ask for a transparent
+                Image models cannot produce real alpha transparency - ask for a transparent
                 background and you get an opaque near-white fill that eats light skin and hair when
                 keyed. So the skills generate on solid flat magenta (#FF00FF) and key exactly that
                 color out.
@@ -47,7 +47,7 @@ python3 -m pip install -r skills/game-asset/scripts/requirements.txt
         <p>
           Every generated spritesheet goes through <a href="#/sprite-preview">Sprite preview</a>{' '}
           first: play it, step frames, onion-skin, and check the baseline. Swapped legs and size
-          wobble are obvious in half a second there — and invisible in a folder of stills.
+          wobble are obvious in half a second there - and invisible in a folder of stills.
         </p>
       </div>
     </>

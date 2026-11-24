@@ -6,7 +6,7 @@ import PageHead from '../components/PageHead';
 
 const LEDE =
   'Place: click a tile to put down the selected item, click again to remove. ' +
-  'Collision: click the cells around a placed item to paint its buffer zone — every instance of that type shares the shape. ' +
+  'Collision: click the cells around a placed item to paint its buffer zone - every instance of that type shares the shape. ' +
   'Drop the export into starter/src/config/map.json and walk around it.';
 
 export default function MapEditorPage() {
@@ -113,7 +113,7 @@ export default function MapEditorPage() {
           </select>
           <span className="muted">
             {mode === 'place'
-              ? `${editor.count(selectedType)} placed · ${map.items.length} total`
+              ? `${editor.count(selectedType)} placed | ${map.items.length} total`
               : editor.count(selectedType) === 0
                 ? `place a ${selectedType} first, then paint its cells`
                 : `${editor.shapeOf(selectedType).length} collision cells on every ${selectedType}`}
@@ -150,7 +150,7 @@ export default function MapEditorPage() {
                     setImportText('');
                     bump();
                   } catch {
-                    setImportText('invalid JSON — expected a map object or items array');
+                    setImportText('invalid JSON - expected a map object or items array');
                   }
                 }}
               >

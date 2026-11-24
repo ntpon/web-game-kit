@@ -1,14 +1,14 @@
 /**
- * particle-juice — tiny juice helpers for Phaser 4 (works on Phaser 3.60+ too).
+ * particle-juice - tiny juice helpers for Phaser 4 (works on Phaser 3.60+ too).
  *
  * Copy this one file into your game. No dependencies, no image files:
  * particle textures are generated in code on first use.
  *
  * Every effect cleans up after itself (no leaked tweens/emitters/timers).
- * Every option has a tuned default — but feel is a human job: open demo.html,
+ * Every option has a tuned default - but feel is a human job: open demo.html,
  * drag the sliders until it feels right, then Copy options JSON.
  *
- * MIT · part of web-game-kit
+ * MIT | part of web-game-kit
  */
 
 const TEX = 'juice-dot';
@@ -55,7 +55,7 @@ export function floatText(scene, x, y, text, opts = {}) {
 }
 
 /**
- * Camera shake — the classic "you got hit".
+ * Camera shake - the classic "you got hit".
  * @param {Phaser.Scene} scene
  * @param {{duration?:number, intensity?:number}} [opts] intensity 0.001 (subtle) .. 0.05 (earthquake)
  */
@@ -128,7 +128,7 @@ export function flash(target, opts = {}) {
 }
 
 /**
- * Squash & stretch — pickup / landing feedback.
+ * Squash & stretch - pickup / landing feedback.
  * @param {Phaser.GameObjects.Sprite|Phaser.GameObjects.Image} target
  * @param {{amount?:number, duration?:number}} [opts] amount 0.15 subtle .. 0.4 cartoony
  */
@@ -177,7 +177,7 @@ export function dust(scene, x, y, opts = {}) {
 }
 
 /**
- * Poof cloud — spawn/despawn smoke.
+ * Poof cloud - spawn/despawn smoke.
  * @param {Phaser.Scene} scene @param {number} x @param {number} y
  * @param {{count?:number, tint?:number, lifespan?:number}} [opts]
  */
@@ -191,7 +191,7 @@ export function poof(scene, x, y, opts = {}) {
 }
 
 /**
- * Spark burst — pickup / critical hit.
+ * Spark burst - pickup / critical hit.
  * @param {Phaser.Scene} scene @param {number} x @param {number} y
  * @param {{count?:number, tint?:number, lifespan?:number, speed?:number}} [opts]
  */

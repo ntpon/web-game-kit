@@ -1,12 +1,12 @@
 /**
- * particle-juice — tiny juice helpers for Phaser 4 (works on Phaser 3.60+ too).
+ * particle-juice - tiny juice helpers for Phaser 4 (works on Phaser 3.60+ too).
  * TypeScript source; `juice.js` is the ready-to-copy plain build of this file.
  *
  * No dependencies, no image files: particle textures are generated in code.
- * Every effect cleans up after itself. Defaults are tuned — but feel is a human
+ * Every effect cleans up after itself. Defaults are tuned - but feel is a human
  * job: open demo.html, drag sliders until it feels right, then Copy options JSON.
  *
- * MIT · part of web-game-kit
+ * MIT | part of web-game-kit
  */
 
 type Scene = Phaser.Scene;
@@ -53,7 +53,7 @@ export function floatText(scene: Scene, x: number, y: number, text: string, opts
 
 export interface ShakeOptions { duration?: number; intensity?: number; }
 
-/** Camera shake — the classic "you got hit". intensity 0.001 subtle .. 0.05 earthquake. */
+/** Camera shake - the classic "you got hit". intensity 0.001 subtle .. 0.05 earthquake. */
 export function shake(scene: Scene, opts: ShakeOptions = {}): void {
   const o = { duration: 120, intensity: 0.01, ...opts };
   scene.cameras.main.shake(o.duration, o.intensity);
@@ -115,7 +115,7 @@ export function flash(target: SpriteLike, opts: FlashOptions = {}): void {
 
 export interface SquashOptions { amount?: number; duration?: number; }
 
-/** Squash & stretch — pickup / landing feedback. amount 0.15 subtle .. 0.4 cartoony. */
+/** Squash & stretch - pickup / landing feedback. amount 0.15 subtle .. 0.4 cartoony. */
 export function squash(target: SpriteLike, opts: SquashOptions = {}): void {
   const o = { amount: 0.25, duration: 90, ...opts };
   const scene = target.scene;
@@ -156,7 +156,7 @@ export function dust(scene: Scene, x: number, y: number, opts: BurstOptions = {}
   });
 }
 
-/** Poof cloud — spawn/despawn smoke. */
+/** Poof cloud - spawn/despawn smoke. */
 export function poof(scene: Scene, x: number, y: number, opts: BurstOptions = {}) {
   const o = { count: 12, tint: 0xdddddd, lifespan: 500, ...opts };
   return burst(scene, x, y, {
@@ -168,7 +168,7 @@ export function poof(scene: Scene, x: number, y: number, opts: BurstOptions = {}
 
 export interface SparkOptions extends BurstOptions { speed?: number; }
 
-/** Spark burst — pickup / critical hit. */
+/** Spark burst - pickup / critical hit. */
 export function spark(scene: Scene, x: number, y: number, opts: SparkOptions = {}) {
   const o = { count: 14, tint: 0xffd75e, lifespan: 420, speed: 180, ...opts };
   return burst(scene, x, y, {

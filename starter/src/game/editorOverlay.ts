@@ -115,7 +115,7 @@ export class EditorOverlay {
   }
 
   private refreshCount(): void {
-    this.countLabel.textContent = `${this.editor.count(this.editor.selectedType)} placed · ${this.deps.map.items.length} total`;
+    this.countLabel.textContent = `${this.editor.count(this.editor.selectedType)} placed | ${this.deps.map.items.length} total`;
   }
 
   private buildPanel(types: string[]): HTMLDivElement {
@@ -191,7 +191,7 @@ export class EditorOverlay {
     panel.appendChild(clearBtn);
 
     const hint = document.createElement('div');
-    hint.textContent = 'click tile: place / remove · WASD pans (moves the player)';
+    hint.textContent = 'click tile: place / remove | WASD pans (moves the player)';
     hint.style.color = '#9aa0a8';
     panel.appendChild(hint);
 

@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:,">
-<title>Sprite Preview — check AI spritesheets before they hit your game</title>
+<title>Sprite Preview - check AI spritesheets before they hit your game</title>
 <script>
 // set the theme before first paint so a light-mode OS never flashes dark
-// ('wgk-theme' is shared with the workbench shell — same origin, same key)
+// ('wgk-theme' is shared with the workbench shell - same origin, same key)
 try {
   var t = localStorage.getItem('wgk-theme');
   if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -34,7 +34,7 @@ try {
     --check1: #e6e9f0; --check2: #f6f7fa;
     --shadow: 0 8px 24px rgba(15, 20, 40, .18);
   }
-  /* the tool matches the workbench shell — one 'wgk-theme' key drives both */
+  /* the tool matches the workbench shell - one 'wgk-theme' key drives both */
   * { box-sizing: border-box; margin: 0; scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
   body.embed header { display: none; }
   body {
@@ -118,8 +118,8 @@ try {
 </head>
 <body>
 <header>
-  <h1><b>sprite-preview</b> — catch broken AI spritesheets before they hit your game</h1>
-  <span class="hint">everything runs locally — your images never leave this page</span>
+  <h1><b>sprite-preview</b> - catch broken AI spritesheets before they hit your game</h1>
+  <span class="hint">everything runs locally - your images never leave this page</span>
   <button id="btnTheme" class="themebtn"></button>
 </header>
 
@@ -142,7 +142,7 @@ try {
         <label>cols</label><input type="number" id="cols" min="1" max="64" value="4">
         <label>rows</label><input type="number" id="rows" min="1" max="64" value="4">
       </div>
-      <div class="stat">frame: <b id="cellinfo">–</b></div>
+      <div class="stat">frame: <b id="cellinfo">-</b></div>
       <div class="row"><button id="btnGuess">Auto-guess grid</button></div>
     </div>
 
@@ -203,7 +203,7 @@ try {
       <div class="big">Drop a spritesheet <b>.png</b> here</div>
       <div class="sub">Optionally drop a <b>.json</b> next (gameasset <code>metadata.json</code>,
         TexturePacker / Phaser atlas) to auto-configure the grid.
-        AI-generated walk cycles look fine frame-by-frame — the drift only shows when they move. This page shows the movement.</div>
+        AI-generated walk cycles look fine frame-by-frame - the drift only shows when they move. This page shows the movement.</div>
       <button class="primary">Choose files…</button>
     </div>
     <div id="viewwrap">
@@ -222,8 +222,8 @@ try {
   <span><kbd>←</kbd><kbd>→</kbd> step frames</span>
   <span><kbd>o</kbd> onion</span>
   <span><kbd>b</kbd> baseline</span>
-  <span>look for: swapped legs · face changes · size wobble · floating feet</span>
-  <span style="margin-left:auto">MIT · <a href="https://github.com/ntpon/web-game-kit">web-game-kit</a></span>
+  <span>look for: swapped legs | face changes | size wobble | floating feet</span>
+  <span style="margin-left:auto">MIT | <a href="https://github.com/ntpon/web-game-kit">web-game-kit</a></span>
 </footer>
 <div id="dropover"><div class="inner">Drop your spritesheet .png<small>add a .json alongside to auto-configure the grid</small></div></div>
 <div id="toast" role="status"></div>
@@ -299,7 +299,7 @@ try {
       // TexturePacker array: { frames: [ { frame:{x,y,w,h} } ] }
       S.explicitFrames = j.frames.map(f => f.frame).map(f => ({ x: f.x, y: f.y, w: f.w, h: f.h }));
     } else {
-      toast('Unrecognized JSON — expected gameasset metadata or a TexturePacker/Phaser atlas', true);
+      toast('Unrecognized JSON - expected gameasset metadata or a TexturePacker/Phaser atlas', true);
       S.jsonName = null; return;
     }
     if (S.explicitFrames) S.frames = S.explicitFrames;
@@ -351,7 +351,7 @@ try {
     $('gridGroup').style.opacity = S.explicitFrames ? .45 : 1;
     $('cols').value = S.cols; $('rows').value = S.rows;
     const f = S.frames[0];
-    $('cellinfo').textContent = f ? `${f.w}×${f.h}px × ${S.frames.length} frames` : '–';
+    $('cellinfo').textContent = f ? `${f.w}×${f.h}px × ${S.frames.length} frames` : '-';
     $('sheetinfo').innerHTML = `<b>${S.imgName || 'sheet'}</b> ${S.img.width}×${S.img.height}px` +
       (S.jsonName ? `<br>json: <b>${S.jsonName}</b>` : '');
     $('baselineOff').value = S.baseOff;
