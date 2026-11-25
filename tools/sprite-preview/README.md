@@ -12,8 +12,8 @@ One HTML file. No build, no install, no network - your images never leave the pa
 ## Use
 
 1. Open `index.html` in any browser.
-2. Drag in a spritesheet `.png` (plus an optional `.json` - gameasset `metadata.json`
-   or a TexturePacker / Phaser atlas - to auto-configure the grid).
+2. Drag in a spritesheet `.png` (plus an optional `.json`, gameasset `metadata.json`
+   or a TexturePacker / Phaser atlas, to auto-configure the grid).
 3. Press **space** to play. Adjust fps, step frames with **←/→**.
 
 Try it now with the included `sample/walk.png` + `sample/walk.json`
