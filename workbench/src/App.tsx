@@ -25,7 +25,7 @@ const ROUTES: Route[] = [
     render: () => (
       <ToolFramePage
         title="Sprite preview"
-        lede="The bundled 4-frame walk starts playing on open. Drop in your own AI-generated sheet and catch drift - swapped legs, size wobble, floating feet - the moment it moves."
+        lede="The bundled 4-frame walk starts playing on open. Drop in your own AI-generated sheet and catch drift (swapped legs, size wobble, floating feet) the moment it moves."
         artifact="config JSON + verified sheet"
         src="tools/sprite-preview/index.html"
       />

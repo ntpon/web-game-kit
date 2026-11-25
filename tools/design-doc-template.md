@@ -1,7 +1,7 @@
 # Game Design Doc - template
 
 <!-- Copy this file into your game project and fill it in BEFORE asking AI to write
-     any code. Rule one of building games with AI: never brief it verbally -
+     any code. Rule one of building games with AI: never brief it verbally:
      this document is the single shared picture between you and the AI. -->
 
 ## 0. The core you're excited about
